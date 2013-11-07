@@ -1,0 +1,4 @@
+*.pyc
+virtenv
+*.sqlite3
+packages
