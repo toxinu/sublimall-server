@@ -1,26 +1,30 @@
 # -*- coding: utf-8 -*-
-import random
-import hashlib
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
+from .utils import get_hash
+
 
 class Member(models.Model):
     user = models.OneToOneField(User)
-    api_key = models.CharField(max_length=100)
+    api_key = models.CharField(max_length=40)
 
     def __unicode__(self):
         return self.user.email
 
     def get_api_key(self):
-        return hashlib.sha224(
-            str(random.getrandbits(256)).encode('utf-8')).hexdigest()[:40]
+        return get_hash()
 
     def save(self):
         if not self.api_key:
             self.api_key = self.get_api_key()
         return super(Member, self).save()
+
+
+class Registration(models.Model):
+    member = models.OneToOneField(Member)
+    key = models.CharField(max_length=40)
 
 
 class Package(models.Model):

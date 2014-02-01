@@ -3,6 +3,7 @@ from django.db import transaction
 from django.shortcuts import render
 from django.views.generic import View
 from django.views.generic import TemplateView
+from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.validators import validate_email
@@ -13,8 +14,11 @@ from django.http import HttpResponseNotFound
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseBadRequest
 
+from .utils import get_hash
+
 from .models import Member
 from .models import Package
+from .models import Registration
 from django.contrib.auth.models import User
 
 
@@ -150,13 +154,31 @@ class RegistrationView(View):
 
         try:
             user = User.objects.create_user(email, email, password)
+            user.is_active = False
             member = Member(user=user)
             member.save()
+
+            registration = Registration(member=member, key=get_hash())
+            registration.save()
+
+            send_mail(
+                'Sublime Sync registration confirmation',
+                'Welcome on Sublime Sync!\nClick here to validate your account:\n'
+                '%s' % reverse('registration-confirmation', args=[registration.key]),
+                'norepply@sublimesync',
+                [email])
         except Exception:
             raise
             return render(request, template, {"form": {'errors': "Error while creating your account. Please contact me."}})
 
-        return HttpResponse({'success': True, 'message': 'Account created!'})
+        return HttpResponseRedirect(reverse('login'))
+
+
+class RegistrationConfirmationView(View):
+    http_method_names = ['get']
+
+    def get(self, request):
+        print(request)
 
 
 class AccountView(TemplateView):

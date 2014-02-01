@@ -12,6 +12,7 @@ from .storage.views import GenerateAPIKey
 from .storage.views import RegistrationView
 from .storage.views import UploadPackageAPIView
 from .storage.views import DownloadPackageAPIView
+from .storage.views import RegistrationConfirmationView
 
 urlpatterns = patterns(
     '',
@@ -22,6 +23,7 @@ urlpatterns = patterns(
     url(r'^login/$', 'django.contrib.auth.views.login', {'template_name': 'login.html'}, name='login'),
     url(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page': reverse_lazy('home')}, name='logout'),
     url(r'^registration/$', RegistrationView.as_view(), name='registration'),
+    url(r'^registration/(?P<key>[\w{}.-]{1,40})$', RegistrationConfirmationView.as_view(), name='registration-confirmation'),
     url(r'^account/$', AccountView.as_view(), name='account'),
     url(r'^account/new_api_key$', GenerateAPIKey.as_view(), name='account-new-api-key'),
 )

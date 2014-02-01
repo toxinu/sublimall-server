@@ -2,3 +2,4 @@
 virtenv
 *.sqlite3
 packages
+email-messages
