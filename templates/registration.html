@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+<form role="form" class="form-horizontal" method="post" action="{% url 'registration' %}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="id_email" name="email" class="col-sm-2 control-label">Email</label>
+        <div class="col-sm-4">
+            <input type="email" name="email" class="form-control" id="id_email" placeholder="foo@bar">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="id_email2" name="email2" class="col-sm-2 control-label">Email confirmation</label>
+        <div class="col-sm-4">
+            <input type="email" name="email2" class="form-control" id="id_email2" placeholder="foo@bar">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="id_password" name="password" class="col-sm-2 control-label">Password</label>
+        <div class="col-sm-4">
+            <input type="password" name="password" class="form-control" id="id_password">
+        </div>
+
+    </div>
+    <div class="form-group">
+        <label for="id_password2" name="password2" class="col-sm-2 control-label">Password confirmation</label>
+        <div class="col-sm-4">
+            <input type="password" name="password2" class="form-control" id="id_password2">
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <span class="help-block">Password must contains at least one alpha character.</span>
+            <span class="help-block">Password must contains at least one numerical character.</span>
+            <span class="help-block">Password must contains at least 6 characters.</span>
+            {% if form.errors %}
+                <span class="help-block">{{ form.errors }}</span>
+            {% endif %}
+            <button type="submit" value="register" class="btn btn-success">Sign up</button>
+        </div>
+    </div>
+    <input type="hidden" name="next" value="{% url 'login' %}" />
+</form>
+{% endblock %}

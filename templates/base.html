@@ -13,14 +13,14 @@
     <div class="container">
       <div class="header">
         <ul class="nav nav-pills pull-right">
-          <li><a href="#">Home</a></li>
+          <li><a href="/#">Home</a></li>
           {% if user.is_authenticated %}
             <li><a href="{% url 'account' %}">Account</a></li>
             <li><a href="{% url 'logout' %}">Logout</a></li>
           {% else %}
+            <li><a href="{% url 'registration' %}">Sign up</a></li>
             <li><a href="{% url 'login' %}">Login</a></li>
           {% endif %}
-          <li><a href="#">Contact</a></li>
         </ul>
         <h3 class="text-muted">Sublime Sync</h3>
       </div>

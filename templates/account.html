@@ -1,4 +1,19 @@
 {% extends 'base.html' %}
 {% block content %}
-My account
+    <h2>My Account</h2>
+    <ul class="list-unstyled">
+        <li><strong>Email</strong> : <kbd>{{ email }}</kbd></li>
+        <li><strong>API key</strong> : <kbd>{{ api_key }}</kbd> </li>
+        <a href="{% url 'account-new-api-key' %}" class="btn btn-warning btn-xs">Generate new API key</a>
+    </ul>
+    <h2>My Sublime</h2>
+    {% if package %}
+        <ul class="list-unstyled">
+            <li><strong>Version</strong> : <kbd>SublimeText {{ package.version }}</kbd></li>
+            <li><strong>Uploaded</strong> : <kbd>{{ package.update }}</kbd></li>
+            <li><strong>Size</strong> : <kbd>{{ package.package.file.size|filesizeformat }}</kbd></li>
+        </ul>
+    {% else %}
+        <p>No package uploaded. Let's install <a href="/#">Sublime Sync plugin!</a></p>
+    {% endif %}
 {% endblock %}
