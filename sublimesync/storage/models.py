@@ -13,18 +13,20 @@ class Member(models.Model):
     def __unicode__(self):
         return self.user.email
 
-    def get_api_key(self):
-        return get_hash()
-
     def save(self):
         if not self.api_key:
-            self.api_key = self.get_api_key()
+            self.api_key = get_hash()
         return super(Member, self).save()
 
 
 class Registration(models.Model):
     member = models.OneToOneField(Member)
     key = models.CharField(max_length=40)
+
+    def save(self):
+        if not self.key:
+            self.key = get_hash()
+        return super(Registration, self).save()
 
 
 class Package(models.Model):
