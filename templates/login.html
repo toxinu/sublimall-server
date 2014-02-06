@@ -19,7 +19,9 @@
 	<div class="form-group">
     	<div class="col-sm-offset-2 col-sm-10">
     		{% if form.errors %}
-				<span class="help-block">Your username and password didn't match. Please try again.</span>
+    			{% for error in form.errors.values %}
+					<span class="help-block">{{ error }}</span>
+    			{% endfor %}
 			{% endif %}
 			<button type="submit" value="login" class="btn btn-success">Log in</button>
 	 	</div>

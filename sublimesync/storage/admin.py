@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 
 from .models import Member
 from .models import Package
+from .models import Registration
 
 
 class MemberInline(admin.TabularInline):
@@ -20,3 +21,4 @@ admin.site.register(User, UserAdmin)
 
 admin.site.register(Member)
 admin.site.register(Package)
+admin.site.register(Registration)

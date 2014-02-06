@@ -92,7 +92,8 @@ class DownloadPackageAPIView(APIView):
         if not package:
             return HttpResponseNotFound()
 
-        response = HttpResponse(package.package.read(), mimetype='application/zip, application/octet-stream')
+        response = HttpResponse(
+            package.package.read(), mimetype='application/zip, application/octet-stream')
         response.streaming = True
         return response
 
@@ -107,7 +108,6 @@ class LoginView(FormView):
         return super(LoginView, self).get(request)
 
     def form_valid(self, form):
-        # Don't login if not active
         auth_login(self.request, form.get_user())
         if self.request.session.test_cookie_worked():
             self.request.session.delete_test_cookie()
@@ -140,9 +140,11 @@ class RegistrationView(View):
         password2 = request.POST.get('password2')
 
         if not email:
-            return render(request, template, {"form": {'errors': "Email can't be empty."}})
+            return render(
+                request, template, {"form": {'errors': "Email can't be empty."}})
         if not password:
-            return render(request, template, {"form": {'errors': "Password can't be empty."}})
+            return render(
+                request, template, {"form": {'errors': "Password can't be empty."}})
 
         try:
             validate_email(email)
@@ -180,14 +182,17 @@ class RegistrationView(View):
                 {"form": {'errors': "Password doesn't match."}})
 
         if not password:
-            return render(request, template, {"form": {'errors': "Need a valid password."}})
+            return render(
+                request, template, {"form": {'errors': "Need a valid password."}})
 
         if User.objects.filter(email=email).exists():
             return render(request, template, {"form": {'errors': "Email already used."}})
 
         try:
-            user = User.objects.create_user(email, email, password)
-            user.is_active = False
+            user = User(username=email, email=email, is_active=False)
+            user.set_password(password)
+            user.save()
+
             member = Member(user=user)
             member.save()
 
@@ -197,7 +202,8 @@ class RegistrationView(View):
             send_mail(
                 'Sublime Sync registration confirmation',
                 'Welcome on Sublime Sync!\nClick here to validate your account:\n'
-                '%s' % reverse('registration-confirmation', args=[registration.key]),
+                '%s' % reverse(
+                    'registration-confirmation', args=[registration.id, registration.key]),
                 'norepply@sublimesync',
                 [email])
         except Exception:
@@ -213,8 +219,25 @@ class RegistrationView(View):
 class RegistrationConfirmationView(View):
     http_method_names = ['get']
 
-    def get(self, request):
-        print(request)
+    def get(self, request, **kwargs):
+        key = kwargs.get('key')
+        pk = kwargs.get('pk')
+
+        registration = Registration.objects.get(pk=pk)
+        if registration is None:
+            return render(
+                request, 'error.html', {'title': 'Error', 'error': 'Key invalid'})
+        if key != registration.key:
+            return render(
+                request, 'error.html', {'title': 'Error', 'error': 'Key invalid'})
+
+        user = registration.member.user
+        user.is_active = True
+        user.save()
+
+        registration.delete()
+
+        return HttpResponseRedirect(reverse('login'))
 
 
 class AccountView(TemplateView):
