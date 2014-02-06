@@ -219,6 +219,9 @@ class RegistrationConfirmationView(View):
 
 class AccountView(TemplateView):
     def get(self, request):
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect(reverse('login'))
+
         user = request.user
         member = Member.objects.get(user=user)
         package = Package.objects.filter(member=member)
@@ -239,7 +242,10 @@ class GenerateAPIKey(View):
     http_method_names = ['get']
 
     def get(self, request):
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect(reverse('login'))
+
         member = Member.objects.get(user=request.user)
-        member.api_key = member.get_api_key()
+        member.api_key = get_hash()
         member.save()
         return HttpResponseRedirect(reverse('account'))
