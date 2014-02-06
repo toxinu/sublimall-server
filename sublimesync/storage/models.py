@@ -8,7 +8,7 @@ from .utils import get_hash
 
 class Member(models.Model):
     user = models.OneToOneField(User)
-    api_key = models.CharField(max_length=40)
+    api_key = models.CharField(max_length=40, null=True, blank=True)
 
     def __unicode__(self):
         return self.user.email

@@ -6,15 +6,17 @@ from django.contrib.auth.models import User
 from .models import Member
 from .models import Package
 
-class MemberInline(admin.StackedInline):
-	model = Member
-	can_delete = False
+
+class MemberInline(admin.TabularInline):
+    model = Member
+    can_delete = False
 
 
 class UserAdmin(UserAdmin):
-	inlines = (MemberInline,)
+    inlines = (MemberInline, )
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
+admin.site.register(Member)
 admin.site.register(Package)

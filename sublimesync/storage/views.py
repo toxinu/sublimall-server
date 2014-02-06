@@ -2,10 +2,11 @@
 from django.db import transaction
 from django.shortcuts import render
 from django.views.generic import View
+from django.views.generic import FormView
 from django.views.generic import TemplateView
+from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
-from django.views.decorators.csrf import csrf_exempt
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.http import HttpResponse
@@ -13,6 +14,11 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseBadRequest
+
+from django.contrib.auth import login as auth_login
+from django.contrib.auth.forms import AuthenticationForm
+from django.utils.decorators import method_decorator
+from django.views.decorators.debug import sensitive_post_parameters
 
 from .utils import get_hash
 
@@ -91,10 +97,37 @@ class DownloadPackageAPIView(APIView):
         return response
 
 
+class LoginView(FormView):
+    form_class = AuthenticationForm
+    template_name = 'login.html'
+
+    def get(self, request):
+        if request.user.is_authenticated():
+            return HttpResponseRedirect(reverse('account'))
+        return super(LoginView, self).get(request)
+
+    def form_valid(self, form):
+        # Don't login if not active
+        auth_login(self.request, form.get_user())
+        if self.request.session.test_cookie_worked():
+            self.request.session.delete_test_cookie()
+        return HttpResponseRedirect(reverse('account'))
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(form=form))
+
+    @method_decorator(sensitive_post_parameters('password'))
+    def dispatch(self, request, *args, **kwargs):
+        request.session.set_test_cookie()
+        return super(LoginView, self).dispatch(request, *args, **kwargs)
+
+
 class RegistrationView(View):
     http_method_names = ['get', 'post']
 
     def get(self, request):
+        if request.user.is_authenticated():
+            return HttpResponseRedirect(reverse('account'))
         return render(request, 'registration.html')
 
     @transaction.commit_on_success
@@ -169,7 +202,10 @@ class RegistrationView(View):
                 [email])
         except Exception:
             raise
-            return render(request, template, {"form": {'errors': "Error while creating your account. Please contact me."}})
+            return render(
+                request,
+                template,
+                {"form": {'errors': "Error while creating your account. Please contact me."}})
 
         return HttpResponseRedirect(reverse('login'))
 
