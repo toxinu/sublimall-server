@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from .utils import get_hash
-
 from .models import Member
 
 
@@ -15,11 +14,6 @@ class UtilsTestCase(TestCase):
         Hash generator must return 40 characters
         """
         self.assertEqual(len(get_hash()), 40)
-
-
-class PluginAPITestCase(TestCase):
-    def setUp(self):
-        self.c = Client()
 
 
 class RedirectionTestCase(TestCase):
@@ -113,13 +107,3 @@ class MemberTestCase(TestCase):
 
 class RegistrationTestCase(TestCase):
     pass
-
-
-class PackageTestCase(TestCase):
-    def setUp(self):
-        user = User(username='foo@bar.com', email='foo@bar.com', is_active=False)
-        user.set_password('foobar')
-        user.save()
-
-        self.member = Member(user=user)
-        self.member.save()

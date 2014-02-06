@@ -1,100 +1,26 @@
 # -*- coding: utf-8 -*-
 from django.db import transaction
 from django.shortcuts import render
+from django.http import HttpResponseRedirect
 from django.views.generic import View
 from django.views.generic import FormView
 from django.views.generic import TemplateView
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.debug import sensitive_post_parameters
+from django.contrib.auth.models import User
+from django.contrib.auth import login as auth_login
+from django.contrib.auth.forms import AuthenticationForm
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
-from django.http import HttpResponseNotFound
-from django.http import HttpResponseForbidden
-from django.http import HttpResponseBadRequest
-
-from django.contrib.auth import login as auth_login
-from django.contrib.auth.forms import AuthenticationForm
 from django.utils.decorators import method_decorator
-from django.views.decorators.debug import sensitive_post_parameters
+
+from .models import Member
+from .models import Registration
 
 from .utils import get_hash
 
-from .models import Member
-from .models import Package
-from .models import Registration
-from django.contrib.auth.models import User
-
-
-class APIView(View):
-    http_method_names = ['post']
-
-    def get_member(self, username, api_key):
-        try:
-            return Member.objects.get(user__username=username, api_key=api_key)
-        except Member.DoesNotExist:
-            return None
-
-    @csrf_exempt
-    def dispatch(self, *args, **kwargs):
-        return super(APIView, self).dispatch(*args, **kwargs)
-
-
-class UploadPackageAPIView(APIView):
-    def post(self, request, *args, **kwargs):
-        username = self.request.FILES.get('username')
-        api_key = self.request.FILES.get('api_key')
-        version = request.FILES.get('version')
-        package = request.FILES.get('package')
-
-        if not username or not api_key or not version or not package:
-            return HttpResponseBadRequest()
-
-        username = username.read()
-        api_key = api_key.read()
-        member = self.get_member(username, api_key)
-        if member is None:
-            return HttpResponseForbidden()
-
-        version = version.read()
-        package = Package(
-            member=member,
-            version=version,
-            package=package)
-        package.save()
-
-        old_package = Package.objects.exclude(id=package.id).filter(
-            member=member, version=version)
-        if old_package.exists():
-            old_package.delete()
-
-        return HttpResponse(201)
-
-
-class DownloadPackageAPIView(APIView):
-    def post(self, request, *args, **kwargs):
-        username = request.POST.get('username')
-        api_key = request.POST.get('api_key')
-        version = request.POST.get('version')
-
-        if not username or not api_key and not version:
-            return HttpResponseBadRequest()
-
-        member = self.get_member(username, api_key)
-        if member is None:
-            return HttpResponseForbidden()
-
-        package = Package.objects.get(
-            member=member, version=version)
-
-        if not package:
-            return HttpResponseNotFound()
-
-        response = HttpResponse(package.package.read(), mimetype='application/zip, application/octet-stream')
-        response.streaming = True
-        return response
+from ..storage.models import Package
 
 
 class LoginView(FormView):
@@ -195,10 +121,10 @@ class RegistrationView(View):
             registration.save()
 
             send_mail(
-                'Sublime Sync registration confirmation',
-                'Welcome on Sublime Sync!\nClick here to validate your account:\n'
+                'Terrance registration confirmation',
+                'Welcome on Terrance!\nClick here to validate your account:\n'
                 '%s' % reverse('registration-confirmation', args=[registration.key]),
-                'norepply@sublimesync',
+                'norepply@terrance',
                 [email])
         except Exception:
             raise

@@ -26,7 +26,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'sublimesync.storage',
+    'terrance.accounts',
+    'terrance.storage',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -38,9 +39,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'sublimesync.urls'
+ROOT_URLCONF = 'terrance.urls'
 
-WSGI_APPLICATION = 'sublimesync.wsgi.application'
+WSGI_APPLICATION = 'terrance.wsgi.application'
 
 
 # Database

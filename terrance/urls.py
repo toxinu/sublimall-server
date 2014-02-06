@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
+from django.contrib import admin
 from django.conf.urls import url
 from django.conf.urls import include
 from django.conf.urls import patterns
 from django.views.generic import TemplateView
 from django.core.urlresolvers import reverse_lazy
-from django.contrib import admin
-admin.autodiscover()
 
-from .storage.views import LoginView
-from .storage.views import AccountView
-from .storage.views import GenerateAPIKey
-from .storage.views import RegistrationView
 from .storage.views import UploadPackageAPIView
 from .storage.views import DownloadPackageAPIView
-from .storage.views import RegistrationConfirmationView
+
+from .accounts.views import LoginView
+from .accounts.views import AccountView
+from .accounts.views import GenerateAPIKey
+from .accounts.views import RegistrationView
+from .accounts.views import RegistrationConfirmationView
+
+admin.autodiscover()
 
 urlpatterns = patterns(
     '',
