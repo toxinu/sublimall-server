@@ -1,7 +1,7 @@
 Terrance
 ========
 
-.. image:: https://magnum.travis-ci.com/socketubs/terrance-server.png?token=8Rz7PXRsaTFUz7F3LJzS?branch=master  
+.. image:: https://magnum.travis-ci.com/socketubs/terrance-server.png?token=8Rz7PXRsaTFUz7F3LJzS&branch=master  
     :target: https://magnum.travis-ci.com/socketubs/terrance-server
 
 Terrance is server behind Terrance SublimeText plugin.
