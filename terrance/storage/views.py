@@ -27,12 +27,14 @@ class APIView(View):
 
 class UploadPackageAPIView(APIView):
     def post(self, request, *args, **kwargs):
-        username = self.request.FILES.get('username')
-        api_key = self.request.FILES.get('api_key')
+        username = request.FILES.get('username')
+        api_key = request.FILES.get('api_key')
         version = request.FILES.get('version')
+        platform = request.FILES.get('platform')
+        arch = request.FILES.get('arch')
         package = request.FILES.get('package')
 
-        if not username or not api_key or not version or not package:
+        if not username or not api_key or not package or not version:
             message = {'success': False, 'errors': []}
             if not username:
                 message['errors'].append('Username is mandatory.')
@@ -50,10 +52,17 @@ class UploadPackageAPIView(APIView):
         if member is None:
             return HttpResponseForbidden()
 
+        if platform:
+            platform = platform.read()
+        if arch:
+            arch = arch.read()
+
         version = version.read()
         package = Package(
             member=member,
             version=version,
+            platform=platform,
+            arch=arch,
             package=package)
         package.full_clean()
         package.save()
