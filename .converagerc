@@ -1,0 +1,3 @@
+[run]
+include = terrance/*
+omit = wsgi.py,*/__init__.py,*/*/tests.py

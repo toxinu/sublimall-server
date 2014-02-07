@@ -3,3 +3,5 @@ virtenv
 *.sqlite3
 packages
 email-messages
+.coverage
+htmlcov
