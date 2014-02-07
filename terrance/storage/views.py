@@ -60,6 +60,14 @@ class UploadPackageAPIView(APIView):
             arch = arch.read()
 
         version = version.read()
+
+        try:
+            version = int(version)
+        except ValueError:
+            return HttpResponseBadRequest(
+                json.dumps(
+                    {'success': False, 'errors': ['Bad version. Must be 2 or 3.']}))
+
         package = Package(
             member=member,
             version=version,
