@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import json
 from django.http import HttpResponse
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseForbidden
@@ -32,7 +33,16 @@ class UploadPackageAPIView(APIView):
         package = request.FILES.get('package')
 
         if not username or not api_key or not version or not package:
-            return HttpResponseBadRequest()
+            message = {'success': False, 'errors': []}
+            if not username:
+                message['errors'].append('Username is mandatory.')
+            if not api_key:
+                message['errors'].append('API key is mandatory.')
+            if not version:
+                message['errors'].append('Version is mandatory.')
+            if not package:
+                message['errors'].append('Package is mandatory.')
+            return HttpResponseBadRequest(json.dumps(message))
 
         username = username.read()
         api_key = api_key.read()
@@ -45,6 +55,7 @@ class UploadPackageAPIView(APIView):
             member=member,
             version=version,
             package=package)
+        package.full_clean()
         package.save()
 
         old_package = Package.objects.exclude(id=package.id).filter(
