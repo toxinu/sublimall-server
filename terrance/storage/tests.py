@@ -3,9 +3,9 @@ from unittest import skip
 from django.test import TestCase
 from django.test.client import Client
 from django.contrib.auth.models import User
-from django.core.files import File
+# from django.core.files import File
 from django.core.urlresolvers import reverse
-from mock import Mock
+# from mock import Mock
 
 from .models import Package
 from ..accounts.models import Member
@@ -68,7 +68,7 @@ class PluginAPITestCase(TestCase):
     def test_upload_too_big_package(self):
         data = {
             'name': 'dick',
-            'username': Mock(spec=File, name='username').write('foo@bar.com'),
+            # 'username': Mock(spec=File, name='username').write('foo@bar.com'),
             # 'api_key': Mock(spec=File).write(self.member.api_key),
             # 'version': Mock(spec=File).write('0.1'),
             # 'package': Mock(spec=File).write(ONE_MB * 10)
