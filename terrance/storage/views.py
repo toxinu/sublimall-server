@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+from django.db import transaction
 from django.http import HttpResponse
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseForbidden
@@ -14,9 +15,9 @@ from ..accounts.models import Member
 class APIView(View):
     http_method_names = ['post']
 
-    def get_member(self, username, api_key):
+    def get_member(self, email, api_key):
         try:
-            return Member.objects.get(user__username=username, api_key=api_key)
+            return Member.objects.get(user__email=email, api_key=api_key)
         except Member.DoesNotExist:
             return None
 
@@ -26,18 +27,19 @@ class APIView(View):
 
 
 class UploadPackageAPIView(APIView):
+    @transaction.commit_on_success
     def post(self, request, *args, **kwargs):
-        username = request.FILES.get('username')
+        email = request.FILES.get('email')
         api_key = request.FILES.get('api_key')
         version = request.FILES.get('version')
         platform = request.FILES.get('platform')
         arch = request.FILES.get('arch')
         package = request.FILES.get('package')
 
-        if not username or not api_key or not package or not version:
+        if not email or not api_key or not package or not version:
             message = {'success': False, 'errors': []}
-            if not username:
-                message['errors'].append('Username is mandatory.')
+            if not email:
+                message['errors'].append('Email is mandatory.')
             if not api_key:
                 message['errors'].append('API key is mandatory.')
             if not version:
@@ -46,9 +48,9 @@ class UploadPackageAPIView(APIView):
                 message['errors'].append('Package is mandatory.')
             return HttpResponseBadRequest(json.dumps(message))
 
-        username = username.read()
+        email = email.read()
         api_key = api_key.read()
-        member = self.get_member(username, api_key)
+        member = self.get_member(email, api_key)
         if member is None:
             return HttpResponseForbidden()
 
