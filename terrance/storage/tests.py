@@ -64,7 +64,7 @@ class PluginAPITestCase(TestCase):
         self.assertEqual(r.status_code, 400)
         self.assertEqual(Package.objects.all().count(), 0)
 
-    @skip
+    @skip('Not finished')
     def test_upload_too_big_package(self):
         data = {
             'name': 'dick',
