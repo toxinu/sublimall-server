@@ -7,11 +7,15 @@
         <a href="{% url 'account-new-api-key' %}" class="btn btn-warning btn-xs">Generate new API key</a>
     </ul>
     <h2>My Sublime</h2>
-    {% if package %}
-        <ul class="list-unstyled">
-            <li><strong>Version</strong> : <kbd>SublimeText {{ package.version }}</kbd></li>
-            <li><strong>Uploaded</strong> : <kbd>{{ package.update }}</kbd></li>
-            <li><strong>Size</strong> : <kbd>{{ package.package.file.size|filesizeformat }}</kbd></li>
+    {% if packages %}
+        <ul>
+        {% for package in packages %}
+            <ul class="list-unstyled">
+                <li><strong>Version</strong> : <kbd>SublimeText {{ package.version }}</kbd></li>
+                <li><strong>Uploaded</strong> : <kbd>{{ package.update }}</kbd></li>
+                <li><strong>Size</strong> : <kbd>{{ package.package.file.size|filesizeformat }}</kbd></li>
+            </ul>
+        {% endfor %}
         </ul>
     {% else %}
         <p>No package uploaded. Let's install <a href="/#">Terrance plugin!</a></p>

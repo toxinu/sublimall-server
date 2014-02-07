@@ -105,22 +105,21 @@ class RegistrationView(View):
                 template,
                 {"form": {'errors': "Password doesn't match."}})
 
-        if not password:
-            return render(
-                request, template, {"form": {'errors': "Need a valid password."}})
-
         if User.objects.filter(email=email).exists():
             return render(request, template, {"form": {'errors': "Email already used."}})
 
         try:
             user = User(username=email, email=email, is_active=False)
             user.set_password(password)
+            user.full_clean()
             user.save()
 
             member = Member(user=user)
+            member.full_clean()
             member.save()
 
             registration = Registration(member=member, key=get_hash())
+            registration.full_clean()
             registration.save()
 
             send_mail(
@@ -130,7 +129,6 @@ class RegistrationView(View):
                 'norepply@terrance',
                 [email])
         except Exception:
-            raise
             return render(
                 request,
                 template,
@@ -146,13 +144,17 @@ class RegistrationConfirmationView(View):
         key = kwargs.get('key')
         pk = kwargs.get('pk')
 
-        registration = Registration.objects.get(pk=pk)
+        try:
+            registration = Registration.objects.get(pk=pk)
+        except Registration.DoesNotExist:
+            registration = None
+
         if registration is None:
             return render(
-                request, 'error.html', {'title': 'Error', 'error': 'Key invalid'})
+                request, 'error.html', {'title': 'Error', 'error': 'Invalid key.'})
         if key != registration.key:
             return render(
-                request, 'error.html', {'title': 'Error', 'error': 'Key invalid'})
+                request, 'error.html', {'title': 'Error', 'error': 'Invalid key.'})
 
         user = registration.member.user
         user.is_active = True
@@ -170,16 +172,13 @@ class AccountView(TemplateView):
 
         user = request.user
         member = Member.objects.get(user=user)
-        package = Package.objects.filter(member=member)
-
-        if package:
-            package = package[0]
+        packages = Package.objects.filter(member=member)
 
         return render(
             request,
             'account.html',
             {
-                'package': package,
+                'packages': packages,
                 'api_key': member.api_key,
                 'email': user.email})
 
