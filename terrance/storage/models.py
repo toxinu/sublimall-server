@@ -7,7 +7,7 @@ from ..accounts.models import Member
 
 class Package(models.Model):
     member = models.ForeignKey(Member)
-    version = models.CharField(max_length=20)
+    version = models.PositiveSmallIntegerField()
     platform = models.CharField(max_length=30, blank=True, null=True)
     arch = models.CharField(max_length=20, blank=True, null=True)
     update = models.DateTimeField(auto_now=True)
