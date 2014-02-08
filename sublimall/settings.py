@@ -3,26 +3,16 @@ import os
 from django.utils.crypto import get_random_string
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-ENV = 'dev'
-
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
-
-if ENV == 'dev':
-    SECRET_KEY = 'aa'
-else:
-    SECRET_KEY = get_random_string(50, chars)
+SECRET_KEY = get_random_string(50, chars)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if ENV == 'dev':
-    DEBUG = True
-    TEMPLATE_DEBUG = True
-else:
-    DEBUG = False
+DEBUG = True
+TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -66,36 +56,19 @@ WSGI_APPLICATION = 'sublimall.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
-
-if ENV == 'dev':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': 'sublimall',
-            'USER': 'sublimall',
-            'PASSWORD': 'sublimall'
-        }
-    }
-
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 TEMPLATE_DIRS = (
@@ -104,18 +77,16 @@ TEMPLATE_DIRS = (
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'assets'),)
 
-if ENV == 'dev':
-    SITE_URL = 'http://localhost:8000'
-else:
-    SITE_URL = "http://sublimall.socketubs.org"
+SITE_URL = 'http://localhost:8000'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
-
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-
-if ENV == 'dev':
-    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-    EMAIL_FILE_PATH = './email-messages'
+try:
+    from .local_settings import *
+except ImportError:
+    print('!! Warning! File "sublimall/local_settings.py" file is missing')
+    print('!! Copy "sublimall/local_settings_example.py" to start a new one')
+    exit(1)
