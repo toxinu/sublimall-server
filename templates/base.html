@@ -26,6 +26,14 @@
         </ul>
         <h3><a href="/#" class="text-muted title">Sublimall</a></h3>
       </div>
+      {% if messages %}
+        <ul class="messages list-unstyled">
+        {% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}><strong>{{ message|safe }}</strong></li>
+        {% endfor %}
+        </ul>
+        <hr>
+      {% endif %}
       {% block content %}{% endblock %}
       <br />
       <div class="footer">
