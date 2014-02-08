@@ -1,32 +1,29 @@
 {% extends 'base.html' %}
+{% load staticfiles %}
 {% block content %}
       <div class="jumbotron">
         <h1>One SublimeText, all your devices</h1>
-        <p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-        <p><a class="btn btn-lg btn-success" href="{% url 'registration' %}" role="button">Sign up today</a></p>
+        <p class="lead">Sublimall is the way to sync and save your SublimeText configuration everywhere. Just create an account, install the plugin and that's all. No personal informations, no credit card required.
+        <br />
+        Sublimall is an opensource, server and plugin. It allows you to encrypt your package in order to increase your privacy. Let's start today!</p>
+        <p><a class="btn btn-lg btn-success" href="{% url 'registration' %}" role="button">Sign up for free</a></p>
       </div>
 
       <div class="row marketing">
-        <div class="col-lg-6">
-          <h4>Subheading</h4>
-          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-          <h4>Subheading</h4>
-          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-          <h4>Subheading</h4>
-          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+        <div class="col-lg-4">
+          <h3 class="step">Install Sublimall plugin</h3>
+          <img class="step" src="{% static 'images/home_step01.png' %}" alt="home_step01" />
+          <p>Install Sublimall plugin in two seconds with Package Control. <kbd>Ctrl-Shift-P</kbd> <kbd>Install Package</kbd> and type <kbd>Sublimall</kbd> to install it.</p>
         </div>
-
-        <div class="col-lg-6">
-          <h4>Subheading</h4>
-          <p>Donec id elit non mi porta gravida at eget metus. Maecenas faucibus mollis interdum.</p>
-
-          <h4>Subheading</h4>
-          <p>Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Cras mattis consectetur purus sit amet fermentum.</p>
-
-          <h4>Subheading</h4>
-          <p>Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+        <div class="col-lg-4">
+          <h3 class="step">Sync your SublimeText</h3>
+          <img class="step" src="{% static 'images/home_step02.png' %}" alt="home_step02" />
+          <p>Syncing your SublimeText configuration is too easy. Just hit <kbd>Ctrl-Shift-P</kbd> <kbd>Sublimall Upload</kbd> and your SublimeText configuration is sent to Sublimall.</p>
+        </div>
+        <div class="col-lg-4">
+          <h3 class="step">Stay sync forever</h3>
+          <img class="step" src="{% static 'images/home_step03.png' %}" alt="home_step03" />
+          <p>Never loose your SublimeText configuration. Just press <kbd>Ctrl-Shift-P</kbd> <kbd>Sublimall Retrieve</kbd> and Sublimall will retrieve your synced configuration.</p>
         </div>
       </div>
 {% endblock %}

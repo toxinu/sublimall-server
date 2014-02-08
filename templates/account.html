@@ -1,26 +1,47 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h2>My Account</h2>
-    <ul class="list-unstyled">
-        <li><strong>Email</strong> : <kbd>{{ email }}</kbd></li>
-        <li><strong>API key</strong> : <kbd>{{ api_key }}</kbd> </li>
-        <a href="{% url 'account-new-api-key' %}" class="btn btn-warning btn-xs">Generate new API key</a>
-    </ul>
-    <h2>My Sublime</h2>
-    {% if packages %}
-        <ul>
-        {% for package in packages %}
-            <ul class="list-unstyled">
-                <li><strong>Version</strong> : <kbd>SublimeText {{ package.version }}</kbd></li>
-                <li><strong>Uploaded</strong> : <kbd>{{ package.update }}</kbd></li>
-                <li><strong>Size</strong> : <kbd>{{ package.package.file.size|filesizeformat }}</kbd></li>
-                {% if package.platform or package.arch %}
-                    <li><strong>System</strong> : <kbd>{{ package.platform }} {{ package.arch }}</kbd></li>
+    <div class="col-lg-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Account</h3>
+            </div>
+            <div class="panel-body">
+                <ul class="list-unstyled">
+                    <li><strong>Email</strong> : {{ email }}</li>
+                    <li><strong>API key</strong> : <kbd>{{ api_key }}</kbd> </li>
+                </ul>
+                <a href="{% url 'account-new-api-key' %}" class="btn btn-warning btn-xs">Generate new API key</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Packages</h3>
+            </div>
+            <div class="panel-body">
+                {% if packages %}
+                    {% for package in packages %}
+                        <ul class="list-unstyled">
+                            <li><strong>Version</strong> : SublimeText {{ package.version }}</li>
+                            <li><strong>Uploaded</strong> : {{ package.update }}</li>
+                            <li><strong>Size</strong> : {{ package.package.file.size|filesizeformat }}</li>
+                            {% if package.platform or package.arch %}
+                                <li><strong>System</strong> : {{ package.platform }} {{ package.arch }}</li>
+                            {% endif %}
+                        </ul>
+                        <form method="post" action="{% url 'api-download' %}">
+                            <input type="hidden" value="{{ email }}" name="email">
+                            <input type="hidden" value="{{ api_key }}" name="api_key">
+                            <input type="hidden" value="{{ package.version }}" name="version">
+                            <button type="submit" class="btn btn-success btn-xs">Download</button>
+                        </form>
+                    {% endfor %}
+                {% else %}
+                    <p>No package uploaded. Let's install <a href="/#">Sublimall plugin!</a></p>
                 {% endif %}
-            </ul>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>No package uploaded. Let's install <a href="/#">Sublimall plugin!</a></p>
-    {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="clearfix"></div>
 {% endblock %}
