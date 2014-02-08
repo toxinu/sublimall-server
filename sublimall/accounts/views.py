@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from urllib.parse import urljoin
 from django.conf import settings
 from django.db import transaction
 from django.shortcuts import render
@@ -16,6 +15,11 @@ from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.utils.decorators import method_decorator
+
+try:
+    from urllib.parse import urljoin
+except ImportError:
+    from urlparse import urljoin
 
 from .models import Member
 from .models import Registration
