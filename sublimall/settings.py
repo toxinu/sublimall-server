@@ -3,18 +3,26 @@ import os
 from django.utils.crypto import get_random_string
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+ENV = 'dev'
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
-SECRET_KEY = get_random_string(50, chars)
+
+if ENV == 'dev':
+    SECRET_KEY = 'aa'
+else:
+    SECRET_KEY = get_random_string(50, chars)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-TEMPLATE_DEBUG = True
+if ENV == 'dev':
+    DEBUG = True
+    TEMPLATE_DEBUG = True
+else:
+    DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -59,12 +67,23 @@ WSGI_APPLICATION = 'sublimall.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if ENV == 'dev':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'sublimall',
+            'USER': 'sublimall',
+            'PASSWORD': 'sublimall'
+        }
+    }
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -83,15 +102,20 @@ TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates'))
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),)
+    os.path.join(BASE_DIR, 'assets'),)
 
-SITE_URL = "http://sublimall.org"
+if ENV == 'dev':
+    SITE_URL = 'http://localhost:8000'
+else:
+    SITE_URL = "http://sublimall.socketubs.org"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = './email-messages'
+if ENV == 'dev':
+    EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+    EMAIL_FILE_PATH = './email-messages'
