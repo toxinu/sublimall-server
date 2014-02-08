@@ -71,4 +71,15 @@ body {
     border-bottom: 0;
   }
 }
-
+a.title:hover {
+  text-decoration: none;
+}
+img.step {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 10px;
+}
+h3.step {
+  text-align: center;
+}
