@@ -20,8 +20,9 @@
     	<div class="col-sm-offset-2 col-sm-10">
     		{% if form.errors %}
     			{% for error in form.errors.values %}
-					<span class="help-block">{{ error }}</span>
+					<span class="help-block"><strong>{{ error }}</strong></span>
     			{% endfor %}
+                <hr>
 			{% endif %}
 			<button type="submit" value="login" class="btn btn-success">Log in</button>
 	 	</div>
