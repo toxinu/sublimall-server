@@ -27,6 +27,7 @@ Tests
 Terrance server is tested at ~100% coverage.
 
 ::
+
     pip install coverage
     make coverage
     firefox htmlcov/index.html
