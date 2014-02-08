@@ -24,7 +24,7 @@ Installation
 Tests
 ~~~~~
 
-Terrance server is tested at ~90% coverage.
+Terrance server is tested at ~100% coverage.
 
 ::
     pip install coverage
