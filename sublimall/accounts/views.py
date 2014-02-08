@@ -158,7 +158,7 @@ class RegistrationView(View):
                             'registration-confirmation',
                             args=[registration.id, registration.key])),
                     urljoin(settings.SITE_URL, reverse('docs'))),
-                'norepply@Sublimall',
+                settings.FROM_EMAIL,
                 [email])
         except Exception:
             return render(
