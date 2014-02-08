@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 import json
 from django.db import transaction
+from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseBadRequest
+from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
@@ -137,3 +140,26 @@ class DownloadPackageAPIView(APIView):
         response['Content-Disposition'] = 'attachment; filename=package_version-%s.zip' \
             % package.version
         return response
+
+
+class DeletePackageAPIView(View):
+    http_method_names = ['get', 'post']
+
+    def get(self, request, **kwargs):
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect(reverse('login'))
+        pk = kwargs.get('pk')
+        try:
+            package = Package.objects.get(pk=pk)
+        except Package.DoesNotExist:
+            return HttpResponseRedirect(reverse('account'))
+        return render(request, 'delete_package.html', {'package': package})
+
+    def post(self, request, pk):
+        try:
+            package = Package.objects.get(pk=pk)
+        except Package.DoesNotExist:
+            return HttpResponseRedirect(reverse('account'))
+
+        package.delete()
+        return HttpResponseRedirect(reverse('account'))
