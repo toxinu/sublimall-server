@@ -34,7 +34,8 @@
                             <input type="hidden" value="{{ email }}" name="email">
                             <input type="hidden" value="{{ api_key }}" name="api_key">
                             <input type="hidden" value="{{ package.version }}" name="version">
-                            <button type="submit" class="btn btn-success btn-xs">Download</button>
+                            <button type="submit" class="btn btn-success btn-sm">Download</button>
+                            <a class="btn btn-danger btn-xs" href="{% url 'delete-package' package.id %}">Delete</a>
                         </form>
                     {% endfor %}
                 {% else %}
