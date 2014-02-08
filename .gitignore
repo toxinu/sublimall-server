@@ -5,3 +5,4 @@ packages
 email-messages
 .coverage
 htmlcov
+local_settings.py
