@@ -1,10 +1,10 @@
-Terrance
-========
+Sublimall
+=========
 
-.. image:: https://magnum.travis-ci.com/socketubs/terrance-server.png?token=8Rz7PXRsaTFUz7F3LJzS&branch=master
-    :target: https://magnum.travis-ci.com/socketubs/terrance-server
+.. image:: https://magnum.travis-ci.com/socketubs/sublimall-server.png?token=8Rz7PXRsaTFUz7F3LJzS&branch=master
+    :target: https://magnum.travis-ci.com/socketubs/sublimall-server
 
-Terrance is server behind Terrance SublimeText plugin.
+Sublimall is server behind Sublimall SublimeText plugin.
 
 
 Installation
@@ -12,8 +12,8 @@ Installation
 
 ::
 
-    git clone https://github.com/socketubs/terrance-server.git
-    cd terrance-server
+    git clone https://github.com/socketubs/sublimall-server.git
+    cd sublimall-server
     virtualenv-3.3 virtenv
     source virtenv
     pip install -r requirements.txt
@@ -24,7 +24,7 @@ Installation
 Tests
 ~~~~~
 
-Terrance server is tested at ~100% coverage.
+Sublimall server is tested at ~100% coverage.
 
 ::
 

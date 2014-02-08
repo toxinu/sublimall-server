@@ -26,8 +26,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'terrance.accounts',
-    'terrance.storage',
+    'sublimall.accounts',
+    'sublimall.storage',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -39,9 +39,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'terrance.urls'
+ROOT_URLCONF = 'sublimall.urls'
 
-WSGI_APPLICATION = 'terrance.wsgi.application'
+WSGI_APPLICATION = 'sublimall.wsgi.application'
 
 
 # Database

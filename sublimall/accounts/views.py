@@ -123,10 +123,10 @@ class RegistrationView(View):
             registration.save()
 
             send_mail(
-                'Terrance registration confirmation',
-                'Welcome on Terrance!\nClick here to validate your account:\n'
+                'Sublimall registration confirmation',
+                'Welcome on Sublimall!\nClick here to validate your account:\n'
                 '%s' % reverse('registration-confirmation', args=[registration.id, registration.key]),
-                'norepply@terrance',
+                'norepply@Sublimall',
                 [email])
         except Exception:
             return render(
