@@ -18,8 +18,7 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
-# Application definition
+MAX_MEMBER = 500
 
 INSTALLED_APPS = (
     'django.contrib.admin',

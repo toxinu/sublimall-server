@@ -58,11 +58,29 @@ class RegistrationView(View):
     def get(self, request):
         if request.user.is_authenticated():
             return HttpResponseRedirect(reverse('account'))
+        current_user_count = Member.objects.all().count()
+        if current_user_count >= settings.MAX_MEMBER:
+            msg = "I'm sorry about that, don't forget that it's " \
+                "a beta version of Sublimall. <br /><strong>Registrations will " \
+                "been soon re-opened!</strong></p><p><em>Geoffrey.</em>"
+            return render(
+                request, 'error.html', {'title': 'Max registration reach', 'error': msg})
         return render(request, 'registration.html')
 
     @transaction.commit_on_success
     def post(self, request):
         template = 'registration.html'
+
+        current_user_count = Member.objects.all().count()
+        if current_user_count >= settings.MAX_MEMBER:
+            return render(
+                request,
+                template,
+                {'form':
+                    {'errors':
+                        "Max member reach. I'm sorry about that, "
+                        "don't forget that it's a beta version of Sublimall. "
+                        "Registrations will been soon re-opened!"}})
 
         email = request.POST.get('email')
         email2 = request.POST.get('email2')
