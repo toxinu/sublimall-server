@@ -29,4 +29,5 @@ urlpatterns = patterns(
     url(r'^registration/(?P<pk>\d+)/(?P<key>[\w{}.-]{1,40})$', RegistrationConfirmationView.as_view(), name='registration-confirmation'),
     url(r'^account/$', AccountView.as_view(), name='account'),
     url(r'^account/new_api_key$', GenerateAPIKey.as_view(), name='account-new-api-key'),
+    url(r'^docs$', TemplateView.as_view(template_name="docs.html"), name='docs'),
 )
