@@ -134,4 +134,6 @@ class DownloadPackageAPIView(APIView):
         response = HttpResponse(
             package.package.read(), mimetype='application/zip, application/octet-stream')
         response.streaming = True
+        response['Content-Disposition'] = 'attachment; filename=package_version-%s.zip' \
+            % package.version
         return response
