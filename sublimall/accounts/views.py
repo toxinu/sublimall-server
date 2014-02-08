@@ -33,6 +33,23 @@ class LoginView(FormView):
     form_class = AuthenticationForm
     template_name = 'login.html'
 
+    def get_form(self, form_class):
+        kwargs = self.get_form_kwargs()
+        data = {
+            'data': {},
+            'files': kwargs.get('files'),
+            'initial': kwargs.get('initial'),
+            'prefix': kwargs.get('prefix')}
+
+        if self.request.method == 'POST' and kwargs.get('data'):
+            for field in ['next', 'username', 'csrfmiddlewaretoken', 'password']:
+                data['data'][field] = kwargs['data'].get(field)
+            data['data']['username'] = data['data']['username'].lower()
+        else:
+            data = kwargs
+
+        return form_class(**data)
+
     def get(self, request):
         if request.user.is_authenticated():
             return HttpResponseRedirect(reverse('account'))
