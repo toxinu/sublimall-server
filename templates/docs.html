@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">What's Sublimall ?</h3>
+        </div>
+        <div class="panel-body">
+            <p>Sublimall is just a server and a SublimeText plugin.</p>
+            <p>The plugin create a compressed (and encrypted if you choose it) archive of your
+            SublimeText configuration and send it to the server.</p>
+            <p>You can store for now one package at the same time.</p>
+            <p>After a long time you reinstall your system or you have a home and work computer so you
+            can just type <kbd>Ctrl-Shift-P</kbd> and hit <kbd>Sublimall retrieve</kbd> to sync your
+            other computer with your previously save configuration.</p>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">How to install SublimeText plugin ?</h3>
+        </div>
+        <div class="panel-body">
+            <p>In order to install Sublimall plugin you have two options, easiest method is if you already have <a href="https://sublime.wbond.net/"><strong>Package Control</strong></a> which I heavily recommand you to use.</p>
+            <p>Hit <kbd>Ctrl-Shift-P</kbd> <kbd>Install Package</kbd> and type <kbd>Sublimall</kbd> to install it.</p>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">How can I trust you ?</h3>
+        </div>
+        <div class="panel-body">
+            <p>If you want to use Sublimall you'll need a free account. No personal informations, no credit cards are required. I heavily encourage you to use encrypted method which means that I'll never read your synced packages. Counterpart is that if you forget your passphrase, you won't recover your configuration.</p>
+            <p>Sublimall is opensource, client and server (<a href="https://github.com/socketubs/sublimall-server">sources</a>). You can contribute, read the code, whatever you want.</p>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Can you read my packages content ?</h3>
+        </div>
+        <div class="panel-body">
+            <p>If you use <em>encrypted</em> method, no.</p>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">How to configure Sublimall plugin ?</h3>
+        </div>
+        <div class="panel-body">
+            <p>Sublimall plugin configuration is very simple.</p>
+            <p>You just have to click on <kbd>Preferences</kbd>, <kbd>Package Settings</kbd>, <kbd>Sublimall</kbd> and <kbd>Settings - User</kbd>.</p>
+            <p>This is default configuration:</p>
+            <pre>{
+    "email": "",
+    "api_key": "",
+    "exclude_from_package_control": false,
+    "encrypt": true
+}</pre>
+            <p>Add you <em>email</em> and your <em>API key</em> which you can find on your <a href="{% url 'account' %}">account</a> page.</p>
+            <p>If <kbd>encrypt</kbd> option is <kbd>true</kbd>, you'll prompt to a passphrase when you'll upload your configuration on Sublimall.</p>
+            <p><strong>Warning!</strong> This passphrase will be showed in cleared text in input bar. After you enter your passphrase, the plugin will encrypt your archive and send it to server.</p>
+        </div>
+    </div>
+{% endblock %}
