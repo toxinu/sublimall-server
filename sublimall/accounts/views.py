@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from urllib.parse import urljoin
+from django.conf import settings
 from django.db import transaction
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
@@ -125,7 +127,15 @@ class RegistrationView(View):
             send_mail(
                 'Sublimall registration confirmation',
                 'Welcome on Sublimall!\nClick here to validate your account:\n'
-                '%s' % reverse('registration-confirmation', args=[registration.id, registration.key]),
+                '%s\n\n'
+                "Let's go to documentation to learn how to install SublimeText plugin.\n"
+                "%s\nBye!" % (
+                    urljoin(
+                        settings.SITE_URL,
+                        reverse(
+                            'registration-confirmation',
+                            args=[registration.id, registration.key])),
+                    urljoin(settings.SITE_URL, reverse('docs'))),
                 'norepply@Sublimall',
                 [email])
         except Exception:
