@@ -7,6 +7,7 @@ from django.views.generic import View
 from django.views.generic import FormView
 from django.views.generic import TemplateView
 from django.views.decorators.debug import sensitive_post_parameters
+from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
@@ -166,6 +167,10 @@ class RegistrationView(View):
                 template,
                 {"form": {'errors': "Error while creating your account. Please contact me."}})
 
+        messages.success(
+            request,
+            "You'll received an email soon, check it to confirm "
+            "your account. See you soon!")
         return HttpResponseRedirect(reverse('login'))
 
 
