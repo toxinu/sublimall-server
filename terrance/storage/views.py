@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseBadRequest
+from django.core.exceptions import ValidationError
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 
@@ -35,8 +36,22 @@ class UploadPackageAPIView(APIView):
         platform = request.FILES.get('platform')
         arch = request.FILES.get('arch')
         package = request.FILES.get('package')
+        package_size = None
 
-        if not email or not api_key or not package or not version:
+        if email:
+            email = email.read()
+        if api_key:
+            api_key = api_key.read()
+        if version:
+            version = version.read()
+        if platform:
+            platform = platform.read()
+        if arch:
+            arch = arch.read()
+        if package:
+            package_size = package.seek(0, 2)
+
+        if not email or not api_key or not package_size or not version:
             message = {'success': False, 'errors': []}
             if not email:
                 message['errors'].append('Email is mandatory.')
@@ -44,22 +59,14 @@ class UploadPackageAPIView(APIView):
                 message['errors'].append('API key is mandatory.')
             if not version:
                 message['errors'].append('Version is mandatory.')
-            if not package:
+            if not package_size:
                 message['errors'].append('Package is mandatory.')
             return HttpResponseBadRequest(json.dumps(message))
 
-        email = email.read()
-        api_key = api_key.read()
         member = self.get_member(email, api_key)
         if member is None:
-            return HttpResponseForbidden()
-
-        if platform:
-            platform = platform.read()
-        if arch:
-            arch = arch.read()
-
-        version = version.read()
+            return HttpResponseForbidden(
+                json.dumps({'success': False, 'errors': ['Bad credentials.']}))
 
         try:
             version = int(version)
@@ -68,42 +75,63 @@ class UploadPackageAPIView(APIView):
                 json.dumps(
                     {'success': False, 'errors': ['Bad version. Must be 2 or 3.']}))
 
-        package = Package(
+        if version not in [2, 3]:
+            return HttpResponseBadRequest(
+                json.dumps(
+                    {'success': False, 'errors': ['Bad version. Must be 2 or 3.']}))
+
+        new_package = Package(
             member=member,
             version=version,
             platform=platform,
             arch=arch,
             package=package)
-        package.full_clean()
-        package.save()
+        try:
+            new_package.full_clean()
+        except ValidationError as err:
+            return HttpResponseBadRequest(
+                json.dumps(
+                    {'success': False, 'errors': err.messages}))
 
-        old_package = Package.objects.exclude(id=package.id).filter(
+        new_package.save()
+
+        old_package = Package.objects.exclude(id=new_package.id).filter(
             member=member, version=version)
         if old_package.exists():
             old_package.delete()
 
-        return HttpResponse(201)
+        return HttpResponse(json.dumps({'success': True}), status=201)
 
 
 class DownloadPackageAPIView(APIView):
     def post(self, request, *args, **kwargs):
-        username = request.POST.get('username')
+        email = request.POST.get('email')
         api_key = request.POST.get('api_key')
         version = request.POST.get('version')
 
-        if not username or not api_key and not version:
-            return HttpResponseBadRequest()
+        if not email or not api_key and not version:
+            message = {'success': False, 'errors': []}
+            if not email:
+                message['errors'].append('Email is mandatory.')
+            if not api_key:
+                message['errors'].append('API key is mandatory.')
+            if not version:
+                message['errors'].append('Version is mandatory.')
+            return HttpResponseBadRequest(json.dumps(message))
 
-        member = self.get_member(username, api_key)
+        member = self.get_member(email, api_key)
         if member is None:
-            return HttpResponseForbidden()
+            return HttpResponseForbidden(
+                json.dumps({'success': False, 'errors': ['Bad credentials.']}))
 
-        package = Package.objects.get(
-            member=member, version=version)
+        try:
+            package = Package.objects.get(
+                member=member, version=version)
+        except Package.DoesNotExist:
+            return HttpResponseNotFound(
+                json.dumps({'success': False, 'errors': ['Package not found.']}))
 
-        if not package:
-            return HttpResponseNotFound()
-
-        response = HttpResponse(package.package.read(), mimetype='application/zip, application/octet-stream')
+        response = HttpResponse(
+            package.package.read(), mimetype='application/zip, application/octet-stream')
         response.streaming = True
         return response
