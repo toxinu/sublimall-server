@@ -19,3 +19,8 @@ class Package(models.Model):
                 'Package size too big. Got %s (limit is %s).' % (
                     int(self.package.file.size / 1024 / 1024), 20))
         super(Package, self).clean()
+
+    def delete(self, *args, **kwargs):
+        storage, path = self.package.storage, self.package.path
+        super(Package, self).delete(*args, **kwargs)
+        storage.delete(path)
