@@ -9,6 +9,9 @@ class Member(models.Model):
     user = models.OneToOneField(User)
     api_key = models.CharField(max_length=40, null=True, blank=True)
 
+    def __str__(self):
+        return self.__unicode__()
+
     def __unicode__(self):
         return self.user.email
 
@@ -21,6 +24,12 @@ class Member(models.Model):
 class Registration(models.Model):
     member = models.OneToOneField(Member)
     key = models.CharField(max_length=40)
+
+    def __str__(self):
+        return self.__unicode__()
+
+    def __unicode__(self):
+        return "%s (%s)" % (self.member.user.email, self.key)
 
     def save(self):
         if not self.key:

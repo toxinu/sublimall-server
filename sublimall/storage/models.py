@@ -13,6 +13,12 @@ class Package(models.Model):
     update = models.DateTimeField(auto_now=True)
     package = models.FileField(upload_to='packages')
 
+    def __str__(self):
+        return self.__unicode__()
+
+    def __unicode__(self):
+        return "%s" % self.member.user.email
+
     def clean(self):
         if self.package.file.size > 20 * 1024 * 1024:
             raise ValidationError(
