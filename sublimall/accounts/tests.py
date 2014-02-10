@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from copy import deepcopy
 from django.core import mail
 from django.test import TestCase
 from django.test.client import Client
@@ -21,12 +22,8 @@ class UtilsTestCase(TestCase):
 class ViewsTestCase(TestCase):
     def setUp(self):
         self.c = Client()
-
-        self.user = User(username="foo@bar.com", email="foo@bar.com")
-        self.user.set_password("foobar")
-        self.user.save()
-
-        self.member = Member(user=self.user)
+        self.member = Member(email="foo@bar.com")
+        self.member.set_password("foobar")
         self.member.save()
 
     def test_access_registration_not_logged(self):
@@ -68,7 +65,7 @@ class ViewsTestCase(TestCase):
         """
         Access registration page while logged
         """
-        self.c.login(username=self.user.username, password="foobar")
+        self.c.login(email=self.member.email, password="foobar")
 
         r = self.c.get(reverse('registration'))
         self.assertEqual(r.status_code, 302)
@@ -77,7 +74,7 @@ class ViewsTestCase(TestCase):
         """
         Access login page while logged
         """
-        self.c.login(username=self.user.username, password="foobar")
+        self.c.login(email=self.member.email, password="foobar")
 
         r = self.c.get(reverse('login'))
         self.assertEqual(r.status_code, 302)
@@ -86,7 +83,7 @@ class ViewsTestCase(TestCase):
         """
         Access new api key page while logged
         """
-        self.c.login(username=self.user.username, password="foobar")
+        self.c.login(email=self.member.email, password="foobar")
 
         r = self.c.get(reverse('account-new-api-key'))
         self.assertEqual(r.status_code, 302)
@@ -95,21 +92,18 @@ class ViewsTestCase(TestCase):
         """
         Access account page while logged
         """
-        self.c.login(username=self.user.username, password="foobar")
+        self.c.login(email=self.member.email, password="foobar")
 
         r = self.c.get(reverse('account'))
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.context['email'], self.user.email)
+        self.assertEqual(r.context['email'], self.member.email)
         self.assertEqual(r.context['api_key'], self.member.api_key)
 
 
 class MemberTestCase(TestCase):
     def setUp(self):
-        user = User(username='foo@bar.com', email='foo@bar.com')
-        user.set_password('foobar')
-        user.save()
-
-        self.member = Member(user=user)
+        self.member = Member(email="foo@bar.com")
+        self.member.set_password('foobar')
         self.member.save()
 
         self.c = Client()
@@ -127,12 +121,15 @@ class MemberTestCase(TestCase):
         """
         Member must have new api key after a GET on new api page
         """
-        self.c.login(username='foo@bar.com', password='foobar')
+        self.c.login(email='foo@bar.com', password='foobar')
+        print('**1* %s' % self.member.api_key)
+        old_api = deepcopy(self.member.api_key)
+
         r = self.c.get(reverse('account-new-api-key'))
         self.assertEqual(r.status_code, 302)
-
-        member = Member.objects.get(user=self.member.user)
-        self.assertNotEqual(self.member.api_key, member.api_key)
+        member = Member.objects.get(pk=self.member.pk)
+        print('**2* %s' % member.api_key)
+        self.assertNotEqual(old_api, member.api_key)
 
 
 class RegistrationTestCase(TestCase):
@@ -140,11 +137,8 @@ class RegistrationTestCase(TestCase):
         self.c = Client()
 
     def test_registration_default_key(self):
-        u = User(username='foo@bar.com', email='foo@bar.com')
-        u.set_password('foobar')
-        u.save()
-
-        m = Member(user=u)
+        m = Member(email='foo@bar.com')
+        m.set_password('foobar')
         m.save()
 
         r = Registration(member=m)
@@ -254,8 +248,8 @@ class RegistrationTestCase(TestCase):
         r = self.c.post(reverse('registration'), data)
         self.assertEqual(r.status_code, 302)
         self.assertEqual(Member.objects.all().count(), 1)
-        member = Member.objects.get(user__email='foo@bar.com')
-        self.assertTrue(member.user.check_password('foobar123'))
+        member = Member.objects.get(email='foo@bar.com')
+        self.assertTrue(member.check_password('foobar123'))
 
         self.assertEqual(Registration.objects.all().count(), 1)
         registration = Registration.objects.get(member=member)
@@ -290,7 +284,7 @@ class RegistrationTestCase(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, ['foo@bar.com'])
 
-        r = Registration.objects.get(member__user__email='foo@bar.com')
+        r = Registration.objects.get(member__email='foo@bar.com')
 
         validation = '%s/%s' % (r.id, r.key) in mail.outbox[0].body
         self.assertTrue(validation)
@@ -306,15 +300,15 @@ class RegistrationTestCase(TestCase):
             'password2': 'foobar123'
         }
         self.c.post(reverse('registration'), data)
-        registration = Registration.objects.get(member__user__email="foo@bar.com")
+        registration = Registration.objects.get(member__email="foo@bar.com")
         r = self.c.get(reverse(
             'registration-confirmation',
             args=[registration.id, registration.key]))
         self.assertEqual(r.status_code, 302)
         self.assertEqual(Registration.objects.all().count(), 0)
 
-        user = User.objects.get(email="foo@bar.com")
-        self.assertTrue(user.is_active)
+        member = Member.objects.get(email="foo@bar.com")
+        self.assertTrue(member.is_active)
 
     def test_registration_confirmation_invalid_pk(self):
         """
@@ -327,14 +321,14 @@ class RegistrationTestCase(TestCase):
             'password2': 'foobar123'
         }
         self.c.post(reverse('registration'), data)
-        registration = Registration.objects.get(member__user__email="foo@bar.com")
+        registration = Registration.objects.get(member__email="foo@bar.com")
         r = self.c.get(reverse('registration-confirmation', args=[100, registration.key]))
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.context['error'], 'Invalid key.')
         self.assertEqual(Registration.objects.all().count(), 1)
 
-        user = User.objects.get(email="foo@bar.com")
-        self.assertFalse(user.is_active)
+        member = Member.objects.get(email="foo@bar.com")
+        self.assertFalse(member.is_active)
 
     def test_registration_confirmation_bad_key(self):
         """
@@ -347,7 +341,7 @@ class RegistrationTestCase(TestCase):
             'password2': 'foobar123'
         }
         self.c.post(reverse('registration'), data)
-        registration = Registration.objects.get(member__user__email="foo@bar.com")
+        registration = Registration.objects.get(member__email="foo@bar.com")
         r = self.c.get(reverse(
             'registration-confirmation',
             args=[registration.id, registration.key[:-4] + "test"]))
@@ -355,8 +349,8 @@ class RegistrationTestCase(TestCase):
         self.assertEqual(r.context['error'], 'Invalid key.')
         self.assertEqual(Registration.objects.all().count(), 1)
 
-        user = User.objects.get(email="foo@bar.com")
-        self.assertFalse(user.is_active)
+        member = Member.objects.get(email="foo@bar.com")
+        self.assertFalse(member.is_active)
 
     def test_inactive_member_login(self):
         """
@@ -387,7 +381,7 @@ class RegistrationTestCase(TestCase):
             'password2': 'foobar123'
         }
         self.c.post(reverse('registration'), data)
-        registration = Registration.objects.get(member__user__email="foo@bar.com")
+        registration = Registration.objects.get(member__email="foo@bar.com")
         r = self.c.get(reverse(
             'registration-confirmation',
             args=[registration.id, registration.key]))

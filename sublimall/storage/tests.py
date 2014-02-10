@@ -4,7 +4,6 @@ from io import BytesIO
 from unittest import skip
 from django.test import TestCase
 from django.test.client import Client
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from .models import Package
@@ -15,12 +14,8 @@ ONE_MB = 'a' * 1000 * 1000
 
 class PluginAPITestCase(TestCase):
     def setUp(self):
-        self.user = User(username="foo@bar.com", email="foo@bar.com")
-        self.user.set_password('foobar')
-        self.user.full_clean()
-        self.user.save()
-
-        self.member = Member(user=self.user)
+        self.member = Member(email="foo@bar.com")
+        self.member.set_password('foobar')
         self.member.full_clean()
         self.member.save()
 
@@ -66,7 +61,7 @@ class PluginAPITestCase(TestCase):
 
     def test_upload_with_bad_credentials(self):
         data = self._get_post_data()
-        self._set(data, 'email', self.user.email)
+        self._set(data, 'email', self.member.email)
         self._set(data, 'api_key', 'teststs')
         self._set(data, 'version', 2)
         self._set(data, 'package', 'content')
@@ -81,7 +76,7 @@ class PluginAPITestCase(TestCase):
 
     def test_upload_without_version(self):
         data = self._get_post_data()
-        self._set(data, 'email', self.user.email)
+        self._set(data, 'email', self.member.email)
         self._set(data, 'api_key', self.member.api_key)
 
         r = self.c.post(reverse('api-upload'), data=data)
@@ -94,7 +89,7 @@ class PluginAPITestCase(TestCase):
 
     def test_upload_with_bad_version(self):
         data = self._get_post_data()
-        self._set(data, 'email', self.user.email)
+        self._set(data, 'email', self.member.email)
         self._set(data, 'api_key', self.member.api_key)
         self._set(data, 'version', 4)
         self._set(data, 'package', 'content')
@@ -108,7 +103,7 @@ class PluginAPITestCase(TestCase):
         self.assertEqual(j['errors'][0], 'Bad version. Must be 2 or 3.')
 
         data = self._get_post_data()
-        self._set(data, 'email', self.user.email)
+        self._set(data, 'email', self.member.email)
         self._set(data, 'api_key', self.member.api_key)
         self._set(data, 'version', 'a')
         self._set(data, 'package', 'content')
@@ -123,7 +118,7 @@ class PluginAPITestCase(TestCase):
 
     def test_upload_two_packages_with_different_version(self):
         data = self._get_post_data()
-        self._set(data, 'email', self.user.email)
+        self._set(data, 'email', self.member.email)
         self._set(data, 'api_key', self.member.api_key)
         self._set(data, 'version', 2)
         self._set(data, 'package', 'content')
@@ -135,7 +130,7 @@ class PluginAPITestCase(TestCase):
         self.assertTrue(j['success'])
 
         data = self._get_post_data()
-        self._set(data, 'email', self.user.email)
+        self._set(data, 'email', self.member.email)
         self._set(data, 'api_key', self.member.api_key)
         self._set(data, 'version', 3)
         self._set(data, 'package', 'content')
@@ -148,7 +143,7 @@ class PluginAPITestCase(TestCase):
 
     def test_upload_too_big_package(self):
         data = self._get_post_data()
-        self._set(data, 'email', self.user.email)
+        self._set(data, 'email', self.member.email)
         self._set(data, 'api_key', self.member.api_key)
         self._set(data, 'version', 2)
         self._set(data, 'package', ONE_MB * 10 * 3)
@@ -158,7 +153,7 @@ class PluginAPITestCase(TestCase):
 
     def test_upload_package_with_same_version(self):
         data = self._get_post_data()
-        self._set(data, 'email', self.user.email)
+        self._set(data, 'email', self.member.email)
         self._set(data, 'api_key', self.member.api_key)
         self._set(data, 'version', 2)
         self._set(data, 'package', ONE_MB * 10)
@@ -166,7 +161,7 @@ class PluginAPITestCase(TestCase):
         self.c.post(reverse('api-upload'), data=data)
 
         data = self._get_post_data()
-        self._set(data, 'email', self.user.email)
+        self._set(data, 'email', self.member.email)
         self._set(data, 'api_key', self.member.api_key)
         self._set(data, 'version', 2)
         self._set(data, 'package', ONE_MB * 10)
@@ -188,7 +183,7 @@ class PluginAPITestCase(TestCase):
 
     def test_download_package_with_bad_credentials(self):
         data = {
-            'email': self.user.email,
+            'email': self.member.email,
             'api_key': 'test',
             'version': 2
         }
@@ -202,7 +197,7 @@ class PluginAPITestCase(TestCase):
 
     def test_download_not_found_package(self):
         data = {
-            'email': self.user.email,
+            'email': self.member.email,
             'api_key': self.member.api_key,
             'version': 2
         }
@@ -217,7 +212,7 @@ class PluginAPITestCase(TestCase):
     @skip('Incomplete test')
     def test_download_package(self):
         data = self._get_post_data()
-        self._set(data, 'email', self.user.email)
+        self._set(data, 'email', self.member.email)
         self._set(data, 'api_key', self.member.api_key)
         self._set(data, 'version', 2)
         self._set(data, 'package', ONE_MB * 10)
@@ -225,7 +220,7 @@ class PluginAPITestCase(TestCase):
         self.c.post(reverse('api-upload'), data=data)
 
         data = {
-            'email': self.user.email,
+            'email': self.member.email,
             'api_key': self.member.api_key,
             'version': 2
         }

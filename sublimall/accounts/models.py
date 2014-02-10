@@ -57,6 +57,12 @@ class Member(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
+    def __str__(self):
+        return self.__unicode__()
+
+    def __unicode__(self):
+        return self.email
+
     def save(self, *args, **kwargs):
         if not self.api_key:
             self.api_key = get_hash()

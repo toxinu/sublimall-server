@@ -228,9 +228,9 @@ class RegistrationConfirmationView(View):
             return render(
                 request, 'error.html', {'title': 'Error', 'error': 'Invalid key.'})
 
-        user = registration.member.user
-        user.is_active = True
-        user.save()
+        member = registration.member
+        member.is_active = True
+        member.save()
 
         registration.delete()
 

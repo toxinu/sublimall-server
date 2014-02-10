@@ -21,7 +21,7 @@ class APIView(View):
 
     def get_member(self, email, api_key):
         try:
-            return Member.objects.get(user__email=email, api_key=api_key)
+            return Member.objects.get(email=email, api_key=api_key)
         except Member.DoesNotExist:
             return None
 
