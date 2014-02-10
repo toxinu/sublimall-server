@@ -17,6 +17,7 @@ TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = []
 
 MAX_MEMBER = 500
+# AUTH_USER_MODEL = 'accounts.Member'
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -25,6 +26,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'south',
     'sublimall.accounts',
     'sublimall.storage',
 )
