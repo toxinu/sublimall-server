@@ -53,10 +53,35 @@ from .utils import get_hash
 #     USERNAME_FIELD = 'email'
 #     REQUIRED_FIELDS = []
 
-#     def save(self):
+#     def save(self, *args, **kwargs):
 #         if not self.api_key:
 #             self.api_key = get_hash()
-#         return super(Member, self).save()
+#         return super(Member, self).save(*args, **kwargs)
+
+#     def get_full_name(self):
+#         return self.email
+
+#     def get_short_name(self):
+#         return self.email
+
+
+class UserTemp(models.Model):
+    from django.contrib.auth.models import Group
+    from django.contrib.auth.models import Permission
+
+    email = models.EmailField(blank=True, unique=True)
+    api_key = models.CharField(max_length=40, null=True, blank=True)
+    is_staff = models.BooleanField(default=False)
+    date_joined = models.DateTimeField(default=timezone.now)
+    is_active = models.BooleanField(default=False)
+    password = models.CharField(max_length=128)
+    last_login = models.DateTimeField(default=timezone.now)
+
+    is_superuser = models.BooleanField(default=False)
+    groups = models.ManyToManyField(
+        Group, blank=True)
+    user_permissions = models.ManyToManyField(
+        Permission, blank=True)
 
 
 class Member(models.Model):
