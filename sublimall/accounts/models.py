@@ -49,6 +49,8 @@ class Member(AbstractBaseUser, PermissionsMixin):
         help_text=_('Designates whether this user should be treated as '
                     'active. Unselect this instead of deleting accounts.'))
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+    registration_key = models.CharField(
+        max_length=40, default=get_hash, null=True, blank=True)
 
     objects = MemberManager()
 
@@ -71,19 +73,3 @@ class Member(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.email
-
-
-class Registration(models.Model):
-    member = models.OneToOneField(Member)
-    key = models.CharField(max_length=40)
-
-    def __str__(self):
-        return self.__unicode__()
-
-    def __unicode__(self):
-        return "%s (%s)" % (self.member.email, self.key)
-
-    def save(self):
-        if not self.key:
-            self.key = get_hash()
-        return super(Registration, self).save()
