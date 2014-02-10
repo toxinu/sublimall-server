@@ -32,6 +32,18 @@ from .utils import get_hash
 logger = logging.getLogger(__name__)
 
 
+class MaintenanceView(TemplateView):
+    template_name = "error.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(MaintenanceView, self).get_context_data(*args, **kwargs)
+        context['title'] = 'Sublimall is in maintenance'
+        context['error'] = '<p>Sorry, Sublimall is under maintenance.</p>' \
+            '<p>Try again a little later.</p><p>Socketubs.</p>'
+        context['hide_navbar'] = True
+        return context
+
+
 class LoginView(FormView):
     form_class = AuthenticationForm
     template_name = 'login.html'
