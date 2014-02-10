@@ -23,7 +23,6 @@ except ImportError:
     from urlparse import urljoin
 
 from .models import Member
-from .models import Registration
 from ..storage.models import Package
 
 from .utils import get_hash
@@ -171,10 +170,6 @@ class RegistrationView(View):
             member.full_clean()
             member.save()
 
-            registration = Registration(member=member, key=get_hash())
-            registration.full_clean()
-            registration.save()
-
             send_mail(
                 'Sublimall registration confirmation',
                 'Welcome on Sublimall!\nClick here to validate your account:\n'
@@ -185,7 +180,7 @@ class RegistrationView(View):
                         settings.SITE_URL,
                         reverse(
                             'registration-confirmation',
-                            args=[registration.id, registration.key])),
+                            args=[member.id, member.registration_key])),
                     urljoin(settings.SITE_URL, reverse('docs'))),
                 settings.FROM_EMAIL,
                 [email])
@@ -217,22 +212,17 @@ class RegistrationConfirmationView(View):
         pk = kwargs.get('pk')
 
         try:
-            registration = Registration.objects.get(pk=pk)
-        except Registration.DoesNotExist:
-            registration = None
+            member = Member.objects.get(pk=pk, registration_key=key)
+        except Member.DoesNotExist:
+            member = None
 
-        if registration is None:
-            return render(
-                request, 'error.html', {'title': 'Error', 'error': 'Invalid key.'})
-        if key != registration.key:
+        if member is None:
             return render(
                 request, 'error.html', {'title': 'Error', 'error': 'Invalid key.'})
 
-        member = registration.member
         member.is_active = True
+        member.registration_key = None
         member.save()
-
-        registration.delete()
 
         return HttpResponseRedirect(reverse('login'))
 

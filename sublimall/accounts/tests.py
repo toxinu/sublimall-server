@@ -6,7 +6,6 @@ from django.core.urlresolvers import reverse
 
 from .utils import get_hash
 from .models import Member
-from .models import Registration
 
 
 class UtilsTestCase(TestCase):
@@ -152,10 +151,7 @@ class RegistrationTestCase(TestCase):
         m.set_password('foobar')
         m.save()
 
-        r = Registration(member=m)
-        r.save()
-
-        self.assertTrue(r.key)
+        self.assertTrue(m.registration_key)
 
     def test_invalid_email(self):
         """
@@ -245,10 +241,7 @@ class RegistrationTestCase(TestCase):
         self.assertEqual(Member.objects.all().count(), 1)
         member = Member.objects.get(email='foo@bar.com')
         self.assertTrue(member.check_password('foobar123'))
-
-        self.assertEqual(Registration.objects.all().count(), 1)
-        registration = Registration.objects.get(member=member)
-        self.assertEqual(len(registration.key), 40)
+        self.assertFalse(member.is_active)
 
     def test_email_already_exists(self):
         """
@@ -279,9 +272,10 @@ class RegistrationTestCase(TestCase):
         self.assertEqual(len(mail.outbox), 1)
         self.assertEqual(mail.outbox[0].to, ['foo@bar.com'])
 
-        r = Registration.objects.get(member__email='foo@bar.com')
+        member = Member.objects.get(email=data.get('email'))
 
-        validation = '%s/%s' % (r.id, r.key) in mail.outbox[0].body
+        validation = '%s/%s' % (
+            member.id, member.registration_key) in mail.outbox[0].body
         self.assertTrue(validation)
 
     def test_registration_confirmation(self):
@@ -295,12 +289,16 @@ class RegistrationTestCase(TestCase):
             'password2': 'foobar123'
         }
         self.c.post(reverse('registration'), data)
-        registration = Registration.objects.get(member__email="foo@bar.com")
+
+        member = Member.objects.get(email=data.get('email'))
+
         r = self.c.get(reverse(
             'registration-confirmation',
-            args=[registration.id, registration.key]))
+            args=[member.id, member.registration_key]))
         self.assertEqual(r.status_code, 302)
-        self.assertEqual(Registration.objects.all().count(), 0)
+
+        member = Member.objects.get(pk=member.pk)
+        self.assertTrue(member.is_active)
 
         member = Member.objects.get(email="foo@bar.com")
         self.assertTrue(member.is_active)
@@ -316,13 +314,15 @@ class RegistrationTestCase(TestCase):
             'password2': 'foobar123'
         }
         self.c.post(reverse('registration'), data)
-        registration = Registration.objects.get(member__email="foo@bar.com")
-        r = self.c.get(reverse('registration-confirmation', args=[100, registration.key]))
+
+        member = Member.objects.get(email=data.get('email'))
+
+        r = self.c.get(reverse(
+            'registration-confirmation', args=[100, member.registration_key]))
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.context['error'], 'Invalid key.')
-        self.assertEqual(Registration.objects.all().count(), 1)
 
-        member = Member.objects.get(email="foo@bar.com")
+        member = Member.objects.get(email=data.get('email'))
         self.assertFalse(member.is_active)
 
     def test_registration_confirmation_bad_key(self):
@@ -336,15 +336,15 @@ class RegistrationTestCase(TestCase):
             'password2': 'foobar123'
         }
         self.c.post(reverse('registration'), data)
-        registration = Registration.objects.get(member__email="foo@bar.com")
+
+        member = Member.objects.get(email=data.get('email'))
+
         r = self.c.get(reverse(
             'registration-confirmation',
-            args=[registration.id, registration.key[:-4] + "test"]))
+            args=[member.id, member.registration_key[:-4] + "test"]))
         self.assertEqual(r.status_code, 200)
         self.assertEqual(r.context['error'], 'Invalid key.')
-        self.assertEqual(Registration.objects.all().count(), 1)
 
-        member = Member.objects.get(email="foo@bar.com")
         self.assertFalse(member.is_active)
 
     def test_inactive_member_login(self):
@@ -376,11 +376,14 @@ class RegistrationTestCase(TestCase):
             'password2': 'foobar123'
         }
         self.c.post(reverse('registration'), data)
-        registration = Registration.objects.get(member__email="foo@bar.com")
+
+        member = Member.objects.get(email=data.get('email'))
+
         r = self.c.get(reverse(
             'registration-confirmation',
-            args=[registration.id, registration.key]))
+            args=[member.id, member.registration_key]))
         r = self.c.post(
-            reverse('login'), {'username': 'foo@bar.com', 'password': 'foobar123'})
+            reverse('login'),
+            {'username': data.get('email'), 'password': data.get('password')})
         self.assertEqual(r.status_code, 302)
         self.assertTrue(self.c.session.get('_auth_user_id', False))
