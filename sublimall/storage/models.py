@@ -17,7 +17,7 @@ class Package(models.Model):
         return self.__unicode__()
 
     def __unicode__(self):
-        return "%s" % self.member.user.email
+        return "%s" % self.member.email
 
     def clean(self):
         if self.package.file.size > 20 * 1024 * 1024:
