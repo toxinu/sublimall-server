@@ -12,6 +12,7 @@
   </head>
   <body>
     <div class="container">
+    {% if not hide_navbar %}
       <div class="header">
         <ul class="nav nav-pills pull-right">
           <li class="{% navactive request 'home' %}"><a href="/#">Home</a></li>
@@ -26,6 +27,7 @@
         </ul>
         <h3><a href="/#" class="text-muted title">Sublimall</a></h3>
       </div>
+    {% endif %}
       {% if messages %}
         <ul class="messages list-unstyled">
         {% for message in messages %}
