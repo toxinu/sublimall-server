@@ -7,7 +7,6 @@ from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.utils.translation import ugettext_lazy as _
 
-
 from .utils import get_hash
 
 
@@ -73,25 +72,6 @@ class Member(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.email
-
-
-class UserTemp(models.Model):
-    from django.contrib.auth.models import Group
-    from django.contrib.auth.models import Permission
-
-    email = models.EmailField(blank=True, unique=True)
-    api_key = models.CharField(max_length=40, null=True, blank=True)
-    is_staff = models.BooleanField(default=False)
-    date_joined = models.DateTimeField(default=timezone.now)
-    is_active = models.BooleanField(default=False)
-    password = models.CharField(max_length=128)
-    last_login = models.DateTimeField(default=timezone.now)
-
-    is_superuser = models.BooleanField(default=False)
-    groups = models.ManyToManyField(
-        Group, blank=True)
-    user_permissions = models.ManyToManyField(
-        Permission, blank=True)
 
 
 class Registration(models.Model):
