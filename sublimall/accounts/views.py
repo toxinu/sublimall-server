@@ -9,7 +9,6 @@ from django.views.generic import FormView
 from django.views.generic import TemplateView
 from django.views.decorators.debug import sensitive_post_parameters
 from django.contrib import messages
-from django.contrib.auth.models import User
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.mail import send_mail
@@ -163,16 +162,12 @@ class RegistrationView(View):
                 template,
                 {"form": {'errors': "Password doesn't match."}})
 
-        if User.objects.filter(email=email).exists():
+        if Member.objects.filter(email=email).exists():
             return render(request, template, {"form": {'errors': "Email already used."}})
 
         try:
-            user = User(username=email, email=email, is_active=False)
-            user.set_password(password)
-            user.full_clean()
-            user.save()
-
-            member = Member(user=user)
+            member = Member(email=email, is_active=False)
+            member.set_password(password)
             member.full_clean()
             member.save()
 
@@ -247,8 +242,7 @@ class AccountView(TemplateView):
         if not request.user.is_authenticated():
             return HttpResponseRedirect(reverse('login'))
 
-        user = request.user
-        member = Member.objects.get(user=user)
+        member = request.user
         packages = Package.objects.filter(member=member)
 
         return render(
@@ -257,7 +251,7 @@ class AccountView(TemplateView):
             {
                 'packages': packages,
                 'api_key': member.api_key,
-                'email': user.email})
+                'email': member.email})
 
 
 class GenerateAPIKey(View):
@@ -267,7 +261,7 @@ class GenerateAPIKey(View):
         if not request.user.is_authenticated():
             return HttpResponseRedirect(reverse('login'))
 
-        member = Member.objects.get(user=request.user)
+        member = request.user
         member.api_key = get_hash()
         member.save()
         return HttpResponseRedirect(reverse('account'))
