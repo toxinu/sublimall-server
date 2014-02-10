@@ -31,7 +31,9 @@ class RegistrationAdmin(admin.ModelAdmin):
 class UserAdmin(UserAdmin):
     inlines = (MemberInline, )
 
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
-admin.site.register(Member, MemberAdmin)
+# admin.site.unregister(User)
+# admin.site.register(User, UserAdmin)
+# admin.site.register(Member, MemberAdmin)
+
+admin.site.register(Member)
 admin.site.register(Registration, RegistrationAdmin)
