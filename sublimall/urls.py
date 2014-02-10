@@ -13,6 +13,7 @@ from .storage.views import DownloadPackageAPIView
 from .accounts.views import LoginView
 from .accounts.views import AccountView
 from .accounts.views import GenerateAPIKey
+from .accounts.views import MaintenanceView
 from .accounts.views import RegistrationView
 from .accounts.views import RegistrationConfirmationView
 
@@ -21,6 +22,7 @@ admin.autodiscover()
 urlpatterns = patterns(
     '',
     url(r'^admin/', include(admin.site.urls)),
+    # url(r'^', MaintenanceView.as_view(), name='maintenance'),
     url(r'^api/upload/$', UploadPackageAPIView.as_view(), name='api-upload'),
     url(r'^api/retrieve/$', DownloadPackageAPIView.as_view(), name='api-download'),
     url(r'^delete/package/(?P<pk>\d+)/$', DeletePackageAPIView.as_view(), name='delete-package'),
