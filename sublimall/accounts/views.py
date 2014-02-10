@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import logging
 from django.conf import settings
 from django.db import transaction
 from django.shortcuts import render
@@ -27,6 +28,8 @@ from .models import Registration
 from ..storage.models import Package
 
 from .utils import get_hash
+
+logger = logging.getLogger(__name__)
 
 
 class LoginView(FormView):
@@ -91,6 +94,7 @@ class RegistrationView(View):
 
         current_user_count = Member.objects.all().count()
         if current_user_count >= settings.MAX_MEMBER:
+            logger.warn('Max registration number reached')
             return render(
                 request,
                 template,
@@ -179,10 +183,17 @@ class RegistrationView(View):
                 settings.FROM_EMAIL,
                 [email])
         except Exception:
+            logger.error(
+                'Registration unhandled exception',
+                exc_info=True,
+                extra={'request': request})
             return render(
                 request,
                 template,
-                {"form": {'errors': "Error while creating your account. Please contact me."}})
+                {"form": {
+                    'errors':
+                    "Error while creating your account. "
+                    "A report have been sent. Sorry about that."}})
 
         messages.success(
             request,
