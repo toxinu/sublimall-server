@@ -4,6 +4,8 @@ from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
 
+from sublimall.accounts.utils import get_hash
+
 
 class Migration(SchemaMigration):
 
@@ -28,7 +30,7 @@ class Migration(SchemaMigration):
 
         # Adding field 'Member.email'
         db.add_column('accounts_member', 'email',
-                      self.gf('django.db.models.fields.EmailField')(unique=True, blank=True, default='', max_length=75),
+                      self.gf('django.db.models.fields.EmailField')(unique=False, blank=True, default=lambda: get_hash(), max_length=75),
                       keep_default=False)
 
         # Adding field 'Member.is_staff'
@@ -64,7 +66,7 @@ class Migration(SchemaMigration):
 
         # User chose to not deal with backwards NULL issues for 'Member.user'
         raise RuntimeError("Cannot reverse this migration. 'Member.user' and its values cannot be restored.")
-        
+
         # The following code is provided here to aid in writing a correct migration        # Adding field 'Member.user'
         db.add_column('accounts_member', 'user',
                       self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True),
@@ -100,7 +102,7 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Member'},
             'api_key': ('django.db.models.fields.CharField', [], {'null': 'True', 'blank': 'True', 'max_length': '40'}),
             'date_joined': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
-            'email': ('django.db.models.fields.EmailField', [], {'unique': 'True', 'blank': 'True', 'max_length': '75'}),
+            'email': ('django.db.models.fields.EmailField', [], {'unique': 'False', 'blank': 'True', 'max_length': '75'}),
             'groups': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Group']", 'blank': 'True', 'related_name': "'user_set'", 'symmetrical': 'False'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'is_staff': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
