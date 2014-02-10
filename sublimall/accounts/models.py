@@ -91,7 +91,7 @@ class Registration(models.Model):
         return self.__unicode__()
 
     def __unicode__(self):
-        return "%s (%s)" % (self.member.user.email, self.key)
+        return "%s (%s)" % (self.member.email, self.key)
 
     def save(self):
         if not self.key:
