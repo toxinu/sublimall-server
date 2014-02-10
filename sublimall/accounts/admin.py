@@ -6,7 +6,9 @@ from .models import Registration
 
 
 class MemberAdmin(admin.ModelAdmin):
-    list_display = ('email', 'api_key', 'is_active', )
+    list_display = ('email', 'api_key', 'is_staff', 'date_joined', 'last_login', )
+    list_filter = ('is_staff', 'date_joined', 'last_login', )
+    search_fields = ('id', 'email', )
 
 
 class RegistrationAdmin(admin.ModelAdmin):
