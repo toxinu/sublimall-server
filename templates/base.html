@@ -28,14 +28,26 @@
         <h3><a href="/#" class="text-muted title">Sublimall</a></h3>
       </div>
     {% endif %}
-      {% if messages %}
-        <ul class="messages list-unstyled">
-        {% for message in messages %}
-          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}><strong>{{ message|safe }}</strong></li>
-        {% endfor %}
-        </ul>
-        <hr>
-      {% endif %}
+      <div class="col-lg-12">
+        {% if notifications %}
+          {% for notification in notifications %}
+            <div class="alert alert-{{ notification.level }}">
+              <strong>{{ notification.title|safe }}</strong> at {{ notification.added }}
+              <p>
+                <small>{{ notification.short_text|safe }}</small>
+              </p>
+            </div>
+          {% endfor %}
+        {% endif %}
+        {% if messages %}
+          <ul class="messages list-unstyled">
+          {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}><strong>{{ message|safe }}</strong></li>
+          {% endfor %}
+          </ul>
+          <hr>
+        {% endif %}
+      </div>
       {% block content %}{% endblock %}
       <br />
       <div class="footer">

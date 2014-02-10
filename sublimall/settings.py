@@ -29,6 +29,7 @@ INSTALLED_APPS = (
     'south',
     'sublimall.accounts',
     'sublimall.storage',
+    'sublimall.notifications',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -49,6 +50,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.tz',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
+    'sublimall.notifications.context_processors.notifications'
 )
 
 ROOT_URLCONF = 'sublimall.urls'
