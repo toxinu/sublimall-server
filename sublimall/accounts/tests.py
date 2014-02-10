@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-from copy import deepcopy
 from django.core import mail
 from django.test import TestCase
 from django.test.client import Client
-from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
 from .utils import get_hash
@@ -65,6 +63,9 @@ class ViewsTestCase(TestCase):
         """
         Access registration page while logged
         """
+        self.member.is_active = True
+        self.member.save()
+
         self.c.login(email=self.member.email, password="foobar")
 
         r = self.c.get(reverse('registration'))
@@ -74,6 +75,9 @@ class ViewsTestCase(TestCase):
         """
         Access login page while logged
         """
+        self.member.is_active = True
+        self.member.save()
+
         self.c.login(email=self.member.email, password="foobar")
 
         r = self.c.get(reverse('login'))
@@ -83,6 +87,9 @@ class ViewsTestCase(TestCase):
         """
         Access new api key page while logged
         """
+        self.member.is_active = True
+        self.member.save()
+
         self.c.login(email=self.member.email, password="foobar")
 
         r = self.c.get(reverse('account-new-api-key'))
@@ -92,6 +99,9 @@ class ViewsTestCase(TestCase):
         """
         Access account page while logged
         """
+        self.member.is_active = True
+        self.member.save()
+
         self.c.login(email=self.member.email, password="foobar")
 
         r = self.c.get(reverse('account'))
@@ -121,15 +131,16 @@ class MemberTestCase(TestCase):
         """
         Member must have new api key after a GET on new api page
         """
+        self.member.is_active = True
+        self.member.save()
+
         self.c.login(email='foo@bar.com', password='foobar')
-        print('**1* %s' % self.member.api_key)
-        old_api = deepcopy(self.member.api_key)
 
         r = self.c.get(reverse('account-new-api-key'))
         self.assertEqual(r.status_code, 302)
+
         member = Member.objects.get(pk=self.member.pk)
-        print('**2* %s' % member.api_key)
-        self.assertNotEqual(old_api, member.api_key)
+        self.assertNotEqual(self.member.api_key, member.api_key)
 
 
 class RegistrationTestCase(TestCase):
@@ -218,22 +229,6 @@ class RegistrationTestCase(TestCase):
         self.assertEqual(
             r.context['form']['errors'],
             "Need at least one alpha character in password.")
-
-    def test_registration_unexpected_error(self):
-        """
-        Unexpected error during registration
-        """
-        data = {
-            'email': 'a' * 30 + 'foo@bar.com',
-            'email2': 'a' * 30 + 'foo@bar.com',
-            'password': 'foobar123',
-            'password2': 'foobar123'
-        }
-        r = self.c.post(reverse('registration'), data)
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(
-            r.context['form']['errors'],
-            "Error while creating your account. Please contact me.")
 
     def test_new_member(self):
         """
