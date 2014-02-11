@@ -6,6 +6,7 @@ from django.conf.urls import patterns
 from django.views.generic import TemplateView
 from django.core.urlresolvers import reverse_lazy
 
+from .storage.views import DeletePackageView
 from .storage.views import DeletePackageAPIView
 from .storage.views import UploadPackageAPIView
 from .storage.views import DownloadPackageAPIView
@@ -25,7 +26,8 @@ urlpatterns = patterns(
     # url(r'^', MaintenanceView.as_view(), name='maintenance'),
     url(r'^api/upload/$', UploadPackageAPIView.as_view(), name='api-upload'),
     url(r'^api/retrieve/$', DownloadPackageAPIView.as_view(), name='api-download'),
-    url(r'^delete/package/(?P<pk>\d+)/$', DeletePackageAPIView.as_view(), name='delete-package'),
+    url(r'^api/delete/$', DeletePackageAPIView.as_view(), name='api-delete'),
+    url(r'^delete/package/(?P<pk>\d+)/$', DeletePackageView.as_view(), name='delete-package'),
     url(r'^$', TemplateView.as_view(template_name="home.html"), name='home'),
     url(r'^login/$', LoginView.as_view(), name='login'),
     url(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page': reverse_lazy('home')}, name='logout'),

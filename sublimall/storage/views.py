@@ -98,8 +98,8 @@ class UploadPackageAPIView(APIView):
 
         new_package.save()
 
-        old_package = Package.objects.exclude(id=new_package.id).filter(
-            member=member, version=version)
+        old_package = member.package_set.exclude(
+            id=new_package.id).filter(version=version)
         if old_package.exists():
             old_package.delete()
 
@@ -128,8 +128,7 @@ class DownloadPackageAPIView(APIView):
                 json.dumps({'success': False, 'errors': ['Bad credentials.']}))
 
         try:
-            package = Package.objects.get(
-                member=member, version=version)
+            package = member.package_set.get(version=version)
         except Package.DoesNotExist:
             return HttpResponseNotFound(
                 json.dumps({'success': False, 'errors': ['Package not found.']}))
@@ -142,24 +141,56 @@ class DownloadPackageAPIView(APIView):
         return response
 
 
-class DeletePackageAPIView(View):
+class DeletePackageView(View):
     http_method_names = ['get', 'post']
 
     def get(self, request, **kwargs):
         if not request.user.is_authenticated():
             return HttpResponseRedirect(reverse('login'))
-        pk = kwargs.get('pk')
         try:
-            package = Package.objects.get(pk=pk)
+            package = request.user.package_set.get(pk=kwargs.get('pk'))
         except Package.DoesNotExist:
             return HttpResponseRedirect(reverse('account'))
         return render(request, 'delete_package.html', {'package': package})
 
     def post(self, request, pk):
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect(reverse('login'))
         try:
-            package = Package.objects.get(pk=pk)
+            package = request.user.package_set.get(pk=pk)
         except Package.DoesNotExist:
             return HttpResponseRedirect(reverse('account'))
 
         package.delete()
         return HttpResponseRedirect(reverse('account'))
+
+
+class DeletePackageAPIView(APIView):
+    def post(self, request):
+        email = request.POST.get('email')
+        api_key = request.POST.get('api_key')
+        version = request.POST.get('version')
+
+        if not email or not api_key or not version:
+            message = {'success': False, 'errors': []}
+            if not email:
+                message['errors'].append('Email is mandatory.')
+            if not api_key:
+                message['errors'].append('API key is mandatory.')
+            if not version:
+                message['errors'].append('Version is mandatory.')
+            return HttpResponseBadRequest(json.dumps(message))
+
+        member = self.get_member(email, api_key)
+        if member is None:
+            return HttpResponseForbidden(
+                json.dumps({'success': False, 'errors': ['Bad credentials.']}))
+
+        try:
+            package = member.package_set.filter(version=version)
+        except Package.DoesNotExist:
+            return HttpResponseNotFound(
+                json.dumps({'success': False, 'errors': ['Package not found.']}))
+
+        package.delete()
+        return HttpResponse({'success': True})

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
 from django.core import mail
 from django.test import TestCase
 from django.test.client import Client
@@ -118,7 +119,39 @@ class MemberTestCase(TestCase):
         self.c = Client()
 
     def test_member_repr(self):
-        self.assertEqual((self.member.__unicode__()), 'foo@bar.com')
+        """
+        Member object representation
+        """
+        self.assertEqual(self.member.__unicode__(), self.member.email)
+        self.assertEqual(self.member.__str__(), self.member.email)
+
+    def test_member_get_full_name(self):
+        """
+        Member object get_full_name method
+        """
+        self.assertEqual(self.member.get_full_name(), self.member.email)
+
+    def test_member_get_short_name(self):
+        """
+        Member object get_short_name method
+        """
+        self.assertEqual(self.member.get_short_name(), self.member.email)
+
+    def test_member_create_superuser(self):
+        """
+        MemberManager create_superuser method
+        """
+        m = Member.objects.create_superuser(email="foo2@bar.com", password="foobar")
+        self.assertTrue(m.is_superuser)
+
+    def test_member_create_user(self):
+        """
+        MemberManager create_user method
+        """
+        m = Member.objects.create_user(email="foo2@bar.com", password="foobar")
+        self.assertTrue(m.is_active)
+
+        self.assertRaises(ValueError, Member.objects.create_user, password="foobar")
 
     def test_member_default_api_key(self):
         """
@@ -387,3 +420,25 @@ class RegistrationTestCase(TestCase):
             {'username': data.get('email'), 'password': data.get('password')})
         self.assertEqual(r.status_code, 302)
         self.assertTrue(self.c.session.get('_auth_user_id', False))
+
+    def test_max_registration_reach(self):
+        old_MAX_MEMBER = settings.MAX_MEMBER
+        settings.MAX_MEMBER = 5
+        for i in range(0, settings.MAX_MEMBER):
+            Member.objects.create_user(email="foo%s@bar.com" % i, password="foobar")
+
+        r = self.c.get(reverse('registration'))
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.context['title'], 'Max registration reach')
+
+        data = {
+            'email': 'foo@bar.com',
+            'email2': 'foo@bar.com',
+            'password': 'foobar123',
+            'password2': 'foobar123'
+        }
+
+        r = self.c.post(reverse('registration'), data)
+        self.assertEqual(r.status_code, 200)
+        self.assertFalse(Member.objects.filter(email='foo@bar.com').exists())
+        settings.MAX_MEMBER = old_MAX_MEMBER

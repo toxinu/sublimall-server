@@ -17,10 +17,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.utils.decorators import method_decorator
 
-try:
-    from urllib.parse import urljoin
-except ImportError:
-    from urlparse import urljoin
+from urllib.parse import urljoin
 
 from .models import Member
 from ..storage.models import Package
@@ -104,7 +101,7 @@ class RegistrationView(View):
 
         current_user_count = Member.objects.all().count()
         if current_user_count >= settings.MAX_MEMBER:
-            logger.warn('Max registration number reached')
+            logger.warning('Max registration number reached')
             return render(
                 request,
                 template,
