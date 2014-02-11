@@ -19,6 +19,10 @@ class Package(models.Model):
     def __unicode__(self):
         return self.member.email
 
+    @property
+    def size(self):
+        return self.package.file.size
+
     def clean(self):
         if self.package.file.size > 20 * 1024 * 1024:
             raise ValidationError(
