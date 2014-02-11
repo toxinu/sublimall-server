@@ -114,8 +114,8 @@ class RegistrationView(View):
                         "don't forget that it's a beta version of Sublimall. "
                         "Registrations will been soon re-opened!"}})
 
-        email = request.POST.get('email')
-        email2 = request.POST.get('email2')
+        email = request.POST.get('email', '').lower()
+        email2 = request.POST.get('email2', '').lower()
         password = request.POST.get('password')
         password2 = request.POST.get('password2')
 
