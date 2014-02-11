@@ -2,6 +2,7 @@
 import json
 from io import BytesIO
 from unittest import skip
+from django.conf import settings
 from django.test import TestCase
 from django.test.client import Client
 from django.core.urlresolvers import reverse
@@ -170,7 +171,10 @@ class PluginAPITestCase(TestCase):
         self._set(data, 'email', self.member.email)
         self._set(data, 'api_key', self.member.api_key)
         self._set(data, 'version', 2)
-        self._set(data, 'package', ONE_MB * 10 * 3)
+        self._set(
+            data,
+            'package',
+            ONE_MB * int(((settings.MAX_PACKAGE_SIZE / 1024 / 1024) * 2)))
 
         r = self.c.post(reverse('api-upload'), data=data)
         self.assertEqual(r.status_code, 400)

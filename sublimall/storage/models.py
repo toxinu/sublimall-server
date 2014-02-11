@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from ..accounts.models import Member
@@ -24,10 +25,11 @@ class Package(models.Model):
         return self.package.file.size
 
     def clean(self):
-        if self.package.file.size > 20 * 1024 * 1024:
+        if self.package.file.size > settings.MAX_PACKAGE_SIZE:
             raise ValidationError(
                 'Package size too big. Got %s (limit is %s).' % (
-                    int(self.package.file.size / 1024 / 1024), 20))
+                    int(self.package.file.size / 1024 / 1024),
+                    settings.MAX_PACKAGE_SIZE / 1024 / 1024))
         super(Package, self).clean()
 
     def delete(self, *args, **kwargs):
