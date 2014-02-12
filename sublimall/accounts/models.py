@@ -51,6 +51,7 @@ class Member(AbstractBaseUser, PermissionsMixin):
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
     registration_key = models.CharField(
         max_length=40, default=get_hash, null=True, blank=True)
+    password_key = models.CharField(max_length=40, null=True, blank=True)
 
     objects = MemberManager()
 
