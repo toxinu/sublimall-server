@@ -128,8 +128,6 @@ class DownloadPackageAPIView(APIMixin, View):
 
 
 class DeletePackageView(LoginRequiredMixin, View):
-    http_method_names = ['get', 'post']
-
     def get(self, request, **kwargs):
         try:
             package = request.user.package_set.get(pk=kwargs.get('pk'))

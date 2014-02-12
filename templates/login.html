@@ -24,7 +24,8 @@
     			{% endfor %}
                 <hr>
 			{% endif %}
-			<button type="submit" value="login" class="btn btn-success">Log in</button>
+			<p><button type="submit" value="login" class="btn btn-success">Log in</button></p>
+            <p><a class="btn btn-info btn-xs" href="{% url 'password-recovery' %}">Forgot your password ?</a></p>
 	 	</div>
 	</div>
 	<input type="hidden" name="next" value="{% url 'account' %}" />

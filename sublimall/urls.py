@@ -4,7 +4,6 @@ from django.conf.urls import url
 from django.conf.urls import include
 from django.conf.urls import patterns
 from django.views.generic import TemplateView
-from django.core.urlresolvers import reverse_lazy
 
 from .storage.views import DeletePackageView
 from .storage.views import DeletePackageAPIView
@@ -18,7 +17,9 @@ from .accounts.views import GenerateAPIKey
 from .accounts.views import MaintenanceView
 from .accounts.views import RegistrationView
 from .accounts.views import AccountDeleteView
+from .accounts.views import PasswordRecoveryView
 from .accounts.views import RegistrationConfirmationView
+from .accounts.views import PasswordRecoveryConfirmationView
 
 admin.autodiscover()
 
@@ -33,7 +34,8 @@ urlpatterns = patterns(
     url(r'^$', TemplateView.as_view(template_name="home.html"), name='home'),
     url(r'^login/$', LoginView.as_view(), name='login'),
     url(r'^logout/$', LogoutView.as_view(), name='logout'),
-    url(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page': reverse_lazy('home')}, name='logout'),
+    url(r'^login/password-recovery$', PasswordRecoveryView.as_view(), name='password-recovery'),
+    url(r'^login/password-recovery/(?P<pk>\d+)/(?P<key>[\w{}.-]{1,40})$', PasswordRecoveryConfirmationView.as_view(), name='password-recovery-confirmation'),
     url(r'^registration/$', RegistrationView.as_view(), name='registration'),
     url(r'^registration/(?P<pk>\d+)/(?P<key>[\w{}.-]{1,40})$', RegistrationConfirmationView.as_view(), name='registration-confirmation'),
     url(r'^account/$', AccountView.as_view(), name='account'),

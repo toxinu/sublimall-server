@@ -23,8 +23,9 @@ from sublimall.storage.models import Package
 from sublimall.mixins import LoginRequiredMixin
 
 from .models import Member
-from .utils import get_hash
 from .forms import LoginForm
+from .utils import get_hash
+from .utils import is_password_valid
 
 logger = logging.getLogger(__name__)
 
@@ -90,8 +91,6 @@ class LogoutView(View):
 
 
 class RegistrationView(View):
-    http_method_names = ['get', 'post']
-
     def get(self, request):
         if request.user.is_authenticated():
             return HttpResponseRedirect(reverse('account'))
@@ -137,35 +136,24 @@ class RegistrationView(View):
         except ValidationError:
             return render(request, template, {"form": {'errors': "Need a valid email."}})
 
-        if len(password) <= 5:
+        if password != password2:
             return render(
                 request,
                 template,
-                {"form": {'errors': "Need at least 6 characters for your password."}})
+                {"form": {'errors': "Password doesn't match."}})
 
-        if not any(char.isalpha() for char in password):
+        password_validation, error = is_password_valid(password)
+        if not password_validation:
             return render(
                 request,
                 template,
-                {"form": {'errors': "Need at least one alpha character in password."}})
-
-        if not any(char.isdigit() for char in password):
-            return render(
-                request,
-                template,
-                {"form":
-                    {'errors': "Need at least one numerical character in password."}})
+                {"form": {"errors": error}})
 
         if email != email2:
             return render(
                 request,
                 template,
                 {"form": {'errors': "Emails doesn't match."}})
-        if password != password2:
-            return render(
-                request,
-                template,
-                {"form": {'errors': "Password doesn't match."}})
 
         if Member.objects.filter(email=email).exists():
             return render(request, template, {"form": {'errors': "Email already used."}})
@@ -180,7 +168,7 @@ class RegistrationView(View):
                 'Sublimall registration confirmation',
                 'Welcome on Sublimall!\nClick here to validate your account:\n'
                 '%s\n\n'
-                "Let's go to documentation to learn how to install SublimeText plugin.\n"
+                "Let's go to documentation to learn how to install Sublimeall plugin.\n"
                 "%s\nBye!" % (
                     urljoin(
                         settings.SITE_URL,
@@ -211,12 +199,7 @@ class RegistrationView(View):
 
 
 class RegistrationConfirmationView(View):
-    http_method_names = ['get']
-
-    def get(self, request, **kwargs):
-        key = kwargs.get('key')
-        pk = kwargs.get('pk')
-
+    def get(self, request, key, pk):
         try:
             member = Member.objects.get(pk=pk, registration_key=key)
         except Member.DoesNotExist:
@@ -249,8 +232,6 @@ class AccountView(LoginRequiredMixin, View):
 
 
 class AccountDeleteView(View, LoginRequiredMixin):
-    http_method_names = ['get', 'post']
-
     def get(self, request, **kwargs):
         return render(request, 'account-delete.html')
 
@@ -263,15 +244,98 @@ class AccountDeleteView(View, LoginRequiredMixin):
         request.user.package_set.all().delete()
         request.user.delete()
         messages.success(
-            request, "You account have been removed with success. See you soon!")
+            request, "Your account has been removed with success. See you soon!")
         return HttpResponseRedirect(reverse('home'))
 
 
 class GenerateAPIKey(LoginRequiredMixin, View):
-    http_method_names = ['get']
-
     def get(self, request):
         member = request.user
         member.api_key = get_hash()
         member.save()
         return HttpResponseRedirect(reverse('account'))
+
+
+class PasswordRecoveryView(View):
+    def get(self, request):
+        return render(request, 'password-recovery.html')
+
+    def post(self, request):
+        email = request.POST.get('email')
+        msg = "If you give me a valid email, you'll received an email with some help."
+        try:
+            member = Member.objects.get(email=email)
+        except Member.DoesNotExist:
+            messages.info(request, msg)
+            return render(request, 'password-recovery.html')
+
+        member.password_key = get_hash()
+        member.save()
+
+        send_mail(
+            'Sublimall password recovery',
+            'Hi,\nClick here to set a new password:\n'
+            '%s\n\n'
+            "Let's go to documentation to learn how to use Sublimall plugin.\n"
+            "%s\nBye!" % (
+                urljoin(
+                    settings.SITE_URL,
+                    reverse(
+                        'password-recovery-confirmation',
+                        args=[member.id, member.password_key])),
+                urljoin(settings.SITE_URL, reverse('docs'))),
+            settings.FROM_EMAIL,
+            [email])
+
+        messages.info(request, msg)
+        return HttpResponseRedirect(reverse('login'))
+
+
+class PasswordRecoveryConfirmationView(View):
+    def get(self, request, pk, key):
+        try:
+            member = Member.objects.get(pk=pk, password_key=key)
+        except Member.DoesNotExist:
+            member = None
+
+        if member is None:
+            return render(
+                request, 'error.html', {'title': 'Error', 'error': 'Invalid key.'})
+
+        return render(
+            request, 'password-recovery-form.html', {'id': pk, 'password_key': key})
+
+    def post(self, request, pk, key):
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
+
+        template = "password-recovery-form.html"
+
+        try:
+            member = Member.objects.get(pk=pk, password_key=key)
+        except Member.DoesNotExist:
+            member = None
+
+        if member is None:
+            return render(
+                request, 'error.html', {'title': 'Error', 'error': 'Invalid key.'})
+
+        if password != password2:
+            return render(
+                request,
+                template,
+                {"form":
+                    {'errors': "Password doesn't match."}, "pk": pk, "password_key": key})
+
+        password_validation, error = is_password_valid(password)
+        if not password_validation:
+            return render(
+                request,
+                template,
+                {"form": {"errors": error}, "pk": pk, "password_key": key})
+
+        member.set_password(password)
+        member.save()
+
+        messages.success(request, "Password changed with success!")
+        return HttpResponseRedirect(reverse('login'))
