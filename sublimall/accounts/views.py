@@ -10,7 +10,7 @@ from django.views.generic import TemplateView
 from django.views.decorators.debug import sensitive_post_parameters
 from django.contrib import messages
 from django.contrib.auth import login as auth_login
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import logout as auth_logout
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
@@ -19,10 +19,12 @@ from django.utils.decorators import method_decorator
 
 from urllib.parse import urljoin
 
-from .models import Member
-from ..storage.models import Package
+from sublimall.storage.models import Package
+from sublimall.mixins import LoginRequiredMixin
 
+from .models import Member
 from .utils import get_hash
+from .forms import LoginForm
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +42,7 @@ class MaintenanceView(TemplateView):
 
 
 class LoginView(FormView):
-    form_class = AuthenticationForm
+    form_class = LoginForm
     template_name = 'login.html'
 
     def get_form(self, form_class):
@@ -78,6 +80,13 @@ class LoginView(FormView):
     def dispatch(self, request, *args, **kwargs):
         request.session.set_test_cookie()
         return super(LoginView, self).dispatch(request, *args, **kwargs)
+
+
+class LogoutView(View):
+    def get(self, request):
+        auth_logout(request)
+        messages.info(request, 'You have been logged out. See you soon.')
+        return HttpResponseRedirect(reverse('home'))
 
 
 class RegistrationView(View):
@@ -224,11 +233,8 @@ class RegistrationConfirmationView(View):
         return HttpResponseRedirect(reverse('login'))
 
 
-class AccountView(TemplateView):
+class AccountView(LoginRequiredMixin, View):
     def get(self, request):
-        if not request.user.is_authenticated():
-            return HttpResponseRedirect(reverse('login'))
-
         member = request.user
         packages = Package.objects.filter(member=member)
 
@@ -236,18 +242,35 @@ class AccountView(TemplateView):
             request,
             'account.html',
             {
+                'is_staff': member.is_staff,
                 'packages': packages,
                 'api_key': member.api_key,
                 'email': member.email})
 
 
-class GenerateAPIKey(View):
+class AccountDeleteView(View, LoginRequiredMixin):
+    http_method_names = ['get', 'post']
+
+    def get(self, request, **kwargs):
+        return render(request, 'account-delete.html')
+
+    @transaction.commit_on_success
+    def post(self, request):
+        if request.user.is_staff:
+            messages.warning(request, "Impossible to remove staff account.")
+            return HttpResponseRedirect(reverse('account'))
+
+        request.user.package_set.all().delete()
+        request.user.delete()
+        messages.success(
+            request, "You account have been removed with success. See you soon!")
+        return HttpResponseRedirect(reverse('home'))
+
+
+class GenerateAPIKey(LoginRequiredMixin, View):
     http_method_names = ['get']
 
     def get(self, request):
-        if not request.user.is_authenticated():
-            return HttpResponseRedirect(reverse('login'))
-
         member = request.user
         member.api_key = get_hash()
         member.save()

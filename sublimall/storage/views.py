@@ -2,6 +2,7 @@
 import json
 from django.db import transaction
 from django.shortcuts import render
+from django.views.generic import View
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.http import HttpResponseNotFound
@@ -9,28 +10,13 @@ from django.http import HttpResponseForbidden
 from django.http import HttpResponseBadRequest
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ValidationError
-from django.views.generic import View
-from django.views.decorators.csrf import csrf_exempt
 
 from .models import Package
-from ..accounts.models import Member
+from sublimall.mixins import APIMixin
+from sublimall.mixins import LoginRequiredMixin
 
 
-class APIView(View):
-    http_method_names = ['post']
-
-    def get_member(self, email, api_key):
-        try:
-            return Member.objects.get(email=email, api_key=api_key)
-        except Member.DoesNotExist:
-            return None
-
-    @csrf_exempt
-    def dispatch(self, *args, **kwargs):
-        return super(APIView, self).dispatch(*args, **kwargs)
-
-
-class UploadPackageAPIView(APIView):
+class UploadPackageAPIView(APIMixin, View):
     @transaction.commit_on_success
     def post(self, request, *args, **kwargs):
         email = request.FILES.get('email')
@@ -106,7 +92,7 @@ class UploadPackageAPIView(APIView):
         return HttpResponse(json.dumps({'success': True}), status=201)
 
 
-class DownloadPackageAPIView(APIView):
+class DownloadPackageAPIView(APIMixin, View):
     def post(self, request, *args, **kwargs):
         email = request.POST.get('email')
         api_key = request.POST.get('api_key')
@@ -141,21 +127,17 @@ class DownloadPackageAPIView(APIView):
         return response
 
 
-class DeletePackageView(View):
+class DeletePackageView(LoginRequiredMixin, View):
     http_method_names = ['get', 'post']
 
     def get(self, request, **kwargs):
-        if not request.user.is_authenticated():
-            return HttpResponseRedirect(reverse('login'))
         try:
             package = request.user.package_set.get(pk=kwargs.get('pk'))
         except Package.DoesNotExist:
             return HttpResponseRedirect(reverse('account'))
-        return render(request, 'delete_package.html', {'package': package})
+        return render(request, 'package-delete.html', {'package': package})
 
     def post(self, request, pk):
-        if not request.user.is_authenticated():
-            return HttpResponseRedirect(reverse('login'))
         try:
             package = request.user.package_set.get(pk=pk)
         except Package.DoesNotExist:
@@ -165,7 +147,7 @@ class DeletePackageView(View):
         return HttpResponseRedirect(reverse('account'))
 
 
-class DeletePackageAPIView(APIView):
+class DeletePackageAPIView(APIMixin, View):
     def post(self, request):
         email = request.POST.get('email')
         api_key = request.POST.get('api_key')
