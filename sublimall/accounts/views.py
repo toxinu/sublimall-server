@@ -136,18 +136,18 @@ class RegistrationView(View):
         except ValidationError:
             return render(request, template, {"form": {'errors': "Need a valid email."}})
 
-        if password != password2:
-            return render(
-                request,
-                template,
-                {"form": {'errors': "Password doesn't match."}})
-
         password_validation, error = is_password_valid(password)
         if not password_validation:
             return render(
                 request,
                 template,
                 {"form": {"errors": error}})
+
+        if password != password2:
+            return render(
+                request,
+                template,
+                {"form": {'errors': "Password doesn't match."}})
 
         if email != email2:
             return render(
@@ -320,19 +320,19 @@ class PasswordRecoveryConfirmationView(View):
             return render(
                 request, 'error.html', {'title': 'Error', 'error': 'Invalid key.'})
 
-        if password != password2:
-            return render(
-                request,
-                template,
-                {"form":
-                    {'errors': "Password doesn't match."}, "pk": pk, "password_key": key})
-
         password_validation, error = is_password_valid(password)
         if not password_validation:
             return render(
                 request,
                 template,
                 {"form": {"errors": error}, "pk": pk, "password_key": key})
+
+        if password != password2:
+            return render(
+                request,
+                template,
+                {"form":
+                    {'errors': "Password doesn't match."}, "pk": pk, "password_key": key})
 
         member.set_password(password)
         member.save()
