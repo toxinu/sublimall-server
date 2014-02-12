@@ -1,58 +1,63 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div class="col-lg-12">
-        {% if notifications %}
-          {% for notification in notifications %}
-            <div class="alert alert-{{ notification.level }}">
-              <strong>{{ notification.title|safe }}</strong> at {{ notification.added }}
-              <p>
-                <small>{{ notification.short_text|safe }}</small>
-              </p>
-            </div>
-          {% endfor %}
-        {% endif %}
-    </div>
-    <div class="col-lg-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Account</h3>
-            </div>
-            <div class="panel-body">
-                <ul class="list-unstyled">
-                    <li><strong>Email</strong> : {{ email }}</li>
-                    <li><strong>API key</strong> : <kbd>{{ api_key }}</kbd> </li>
-                </ul>
-                <a href="{% url 'account-new-api-key' %}" class="btn btn-warning btn-xs">Generate new API key</a>
+    <div class="row">
+        <div class="col-lg-12">
+            {% if notifications %}
+              {% for notification in notifications %}
+                <div class="alert alert-{{ notification.level }}">
+                  <strong>{{ notification.title|safe }}</strong> at {{ notification.added }}
+                  <p>
+                    <small>{{ notification.short_text|safe }}</small>
+                  </p>
+                </div>
+              {% endfor %}
+            {% endif %}
+        </div>
+        <div class="col-lg-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Account</h3>
+                </div>
+                <div class="panel-body">
+                    <ul class="list-unstyled">
+                        <li><strong>Email</strong> : {{ email }}</li>
+                        <li><strong>API key</strong> : <kbd>{{ api_key }}</kbd> </li>
+                    </ul>
+                    <p><a href="{% url 'account-new-api-key' %}" class="btn btn-warning btn-xs">Generate new API key</a></p>
+                    {% if not is_staff %}
+                        <p><a href="{% url 'account-delete' %}" class="btn btn-danger btn-xs">Delete your account</a></p>
+                    {% endif %}
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-lg-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">Packages</h3>
-            </div>
-            <div class="panel-body">
-                {% if packages %}
-                    {% for package in packages %}
-                        <ul class="list-unstyled">
-                            <li><strong>Version</strong> : SublimeText {{ package.version }}</li>
-                            <li><strong>Uploaded</strong> : {{ package.update }}</li>
-                            <li><strong>Size</strong> : {{ package.package.file.size|filesizeformat }}</li>
-                            {% if package.platform or package.arch %}
-                                <li><strong>System</strong> : {{ package.platform }} {{ package.arch }}</li>
-                            {% endif %}
-                        </ul>
-                        <form method="post" action="{% url 'api-download' %}">
-                            <input type="hidden" value="{{ email }}" name="email">
-                            <input type="hidden" value="{{ api_key }}" name="api_key">
-                            <input type="hidden" value="{{ package.version }}" name="version">
-                            <button type="submit" class="btn btn-success btn-sm">Download</button>
-                            <a class="btn btn-danger btn-xs" href="{% url 'delete-package' package.id %}">Delete</a>
-                        </form>
-                    {% endfor %}
-                {% else %}
-                    <p>No package uploaded. Let's install <a href="{% url 'docs' %}">Sublimall plugin!</a></p>
-                {% endif %}
+        <div class="col-lg-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Packages</h3>
+                </div>
+                <div class="panel-body">
+                    {% if packages %}
+                        {% for package in packages %}
+                            <ul class="list-unstyled">
+                                <li><strong>Version</strong> : SublimeText {{ package.version }}</li>
+                                <li><strong>Uploaded</strong> : {{ package.update }}</li>
+                                <li><strong>Size</strong> : {{ package.package.file.size|filesizeformat }}</li>
+                                {% if package.platform or package.arch %}
+                                    <li><strong>System</strong> : {{ package.platform }} {{ package.arch }}</li>
+                                {% endif %}
+                            </ul>
+                            <form method="post" action="{% url 'api-download' %}">
+                                <input type="hidden" value="{{ email }}" name="email">
+                                <input type="hidden" value="{{ api_key }}" name="api_key">
+                                <input type="hidden" value="{{ package.version }}" name="version">
+                                <button type="submit" class="btn btn-success btn-sm">Download</button>
+                                <a class="btn btn-danger btn-xs" href="{% url 'delete-package' package.id %}">Delete</a>
+                            </form>
+                        {% endfor %}
+                    {% else %}
+                        <p>No package uploaded. Let's install <a href="{% url 'docs' %}">Sublimall plugin!</a></p>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
