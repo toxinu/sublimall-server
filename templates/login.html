@@ -20,11 +20,7 @@
     	<div class="col-sm-offset-2 col-sm-10">
     		{% if form.errors %}
     			{% for field, error in form.errors.items %}
-                    {% if field == '__all__' %}
-                       <span class="help-block"><strong>Bad credentials.</strong></span>
-                    {% else %}
-					   <span class="help-block">{{ field|title }} {{ error }}</span>
-                    {% endif %}
+                    <span class="help-block"><strong>{{ error }}</strong></span>
     			{% endfor %}
                 <hr>
 			{% endif %}
