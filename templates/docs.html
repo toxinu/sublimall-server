@@ -5,7 +5,7 @@
             <h3 class="panel-title">What's Sublimall ?</h3>
         </div>
         <div class="panel-body">
-            <p>Sublimall is just a server and a SublimeText plugin.</p>
+            <p>Sublimall is a server and a SublimeText plugin.</p>
             <p>The plugin create a compressed (and encrypted if you choose it) archive of your
             SublimeText configuration and send it to the server.</p>
             <p>You can store for now one package at the same time.</p>
@@ -19,6 +19,12 @@
             <h3 class="panel-title">How to install SublimeText plugin ?</h3>
         </div>
         <div class="panel-body">
+            <p>You'll need to have <strong>7zip</strong> installed on your system.</p>
+            <ul>
+                <li><strong>Ubuntu</strong>: <kbd>apt-get install p7zip-full</kbd></li>
+                <li><strong>Osx</strong>: <kbd>brew install p7zip</kbd></li>
+                <li><strong>Windows</strong>: Go to <a href="http://www.7-zip.org/download.html">7zip website</a></li>
+            </ul>
             <p>In order to install Sublimall plugin you have two options, easiest method is if you already have <a href="https://sublime.wbond.net/"><strong>Package Control</strong></a> which I heavily recommand you to use.</p>
             <p>Hit <kbd>Ctrl-Shift-P</kbd> <kbd>Install Package</kbd> and type <kbd>Sublimall</kbd> to install it.</p>
         </div>
@@ -30,7 +36,7 @@
         <div class="panel-body">
             <p>I'm <a href="http://socketubs.org">Geoffrey Lehée</a> from France. A Python and Django developer.</p>
             <p>If you want to use Sublimall you'll need a free account. No personal informations, no credit cards are required. I heavily encourage you to use encrypted method which means that I'll never read your synced packages. Counterpart is that if you forget your passphrase, you won't recover your configuration.</p>
-            <p>Sublimall is opensource, client and server (<a href="https://github.com/socketubs/sublimall-server">sources</a>) released under <a href="https://github.com/socketubs/sublimall-server/blob/master/LICENSE">MIT License</a>. You can contribute, read the code, whatever you want.</p>
+            <p>Sublimall is opensource, <a href="https://github.com/socketubs/Sublimall">client</a> and server (soon) sources are released under MIT Licenses. You can contribute, read the code, whatever you want.</p>
             <p>So you can host your own Sublimall server.</p>
         </div>
     </div>
@@ -40,6 +46,7 @@
         </div>
         <div class="panel-body">
             <p>If you use <em>encrypted</em> method, no.</p>
+            <p>For now, in Sublimall <kbd>0.0.4</kbd> encryption is broken. But it'll be fixed in <kbd>0.0.5</kbd>.</p>
         </div>
     </div>
     <div class="panel panel-default">
@@ -52,10 +59,25 @@
             <p>You just have to click on <kbd>Preferences</kbd>, <kbd>Package Settings</kbd>, <kbd>Sublimall</kbd> and <kbd>Settings - User</kbd>.</p>
             <p>This is default configuration:</p>
             <pre>{
+    ////////////////////////////
+    //// Sublimall settings ////
+    ////////////////////////////
+    "api_root": "http://sublimall.org",
+    "api_upload_url": "/api/upload/",
+    "api_retrieve_url": "/api/retrieve/",
+    "backup_directory_name": "backups",
+
+    ///////////////////////
+    //// User settings ////
+    ///////////////////////
     "email": "",
     "api_key": "",
+    // Set true if you want to exclude packages managed by Package Control
     "exclude_from_package_control": false,
-    "encrypt": true
+    // Set false if you don't want to encrypt your configuration
+    "encrypt": true,
+    // Upload timeout in seconds
+    "http_upload_timeout": 60
 }</pre>
             <p>Add you <em>email</em> and your <em>API key</em> which you can find on your <a href="{% url 'account' %}">account</a> page.</p>
             <p>If <kbd>encrypt</kbd> option is <kbd>true</kbd>, you'll prompt to a passphrase when you'll upload your configuration on Sublimall.</p>
