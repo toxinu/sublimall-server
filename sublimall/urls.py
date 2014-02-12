@@ -12,10 +12,12 @@ from .storage.views import UploadPackageAPIView
 from .storage.views import DownloadPackageAPIView
 
 from .accounts.views import LoginView
+from .accounts.views import LogoutView
 from .accounts.views import AccountView
 from .accounts.views import GenerateAPIKey
 from .accounts.views import MaintenanceView
 from .accounts.views import RegistrationView
+from .accounts.views import AccountDeleteView
 from .accounts.views import RegistrationConfirmationView
 
 admin.autodiscover()
@@ -30,10 +32,12 @@ urlpatterns = patterns(
     url(r'^delete/package/(?P<pk>\d+)/$', DeletePackageView.as_view(), name='delete-package'),
     url(r'^$', TemplateView.as_view(template_name="home.html"), name='home'),
     url(r'^login/$', LoginView.as_view(), name='login'),
+    url(r'^logout/$', LogoutView.as_view(), name='logout'),
     url(r'^logout/$', 'django.contrib.auth.views.logout', {'next_page': reverse_lazy('home')}, name='logout'),
     url(r'^registration/$', RegistrationView.as_view(), name='registration'),
     url(r'^registration/(?P<pk>\d+)/(?P<key>[\w{}.-]{1,40})$', RegistrationConfirmationView.as_view(), name='registration-confirmation'),
     url(r'^account/$', AccountView.as_view(), name='account'),
+    url(r'^account/delete$', AccountDeleteView.as_view(), name='account-delete'),
     url(r'^account/new_api_key$', GenerateAPIKey.as_view(), name='account-new-api-key'),
     url(r'^docs$', TemplateView.as_view(template_name="docs.html"), name='docs'),
 )
