@@ -1,0 +1,21 @@
+{% extends 'email/base.html' %}
+
+{% block title %}
+Sublimall account deleted
+{% endblock %}
+
+{% block subtitle %}
+{% endblock %}
+
+{% block lead %}
+Sad to see you leave Sublimall.
+{% endblock %}
+
+{% block content %}
+Your account has been deleted with all your data.<br/>
+See you soon.
+{% endblock %}
+
+{% block callout %}
+Please give me feedback about why you leave at <a href="mailto:{{ feedback_email }}">{{ feedback_email }}</a>.
+{% endblock %}

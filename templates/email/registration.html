@@ -1,0 +1,21 @@
+{% extends 'email/base.html' %}
+
+{% block title %}
+Sublimall registration confirmation
+{% endblock %}
+
+{% block subtitle %}
+{% endblock %}
+
+{% block lead %}
+Thank you for your interest in Sublimall!
+{% endblock %}
+
+{% block content %}
+You just have to validate your account before using Sublimall.<br />
+Just click on registration link below.
+{% endblock %}
+
+{% block callout %}
+<a href="{{ registration_link }}">Click here to validate your account!</a>
+{% endblock %}

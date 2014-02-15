@@ -1,0 +1,5 @@
+Sad to see you leave Sublimall.\n
+Your account has been deleted with all your data.\n\n
+Please give me feedback about why you leave at {{ feedback_email }}.\n
+
+See you soon!\n

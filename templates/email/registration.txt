@@ -1,0 +1,7 @@
+Thank you for your interest in Sublimall!\n
+You just have to validate your account before using Sublimall.\n
+Just click on registration link below.\n\n
+
+{{ registration_link }}
+
+See you soon!\n

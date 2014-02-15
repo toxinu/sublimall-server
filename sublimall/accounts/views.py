@@ -11,7 +11,6 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.contrib import messages
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
-from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
@@ -19,6 +18,7 @@ from django.utils.decorators import method_decorator
 
 from urllib.parse import urljoin
 
+from sublimall.utils import send_custom_mail
 from sublimall.storage.models import Package
 from sublimall.mixins import LoginRequiredMixin
 
@@ -164,20 +164,16 @@ class RegistrationView(View):
             member.full_clean()
             member.save()
 
-            send_mail(
-                'Sublimall registration confirmation',
-                'Welcome on Sublimall!\nClick here to validate your account:\n'
-                '%s\n\n'
-                "Let's go to documentation to learn how to install Sublimeall plugin.\n"
-                "%s\nBye!" % (
-                    urljoin(
-                        settings.SITE_URL,
-                        reverse(
-                            'registration-confirmation',
-                            args=[member.id, member.registration_key])),
-                    urljoin(settings.SITE_URL, reverse('docs'))),
-                settings.FROM_EMAIL,
-                [email])
+            send_custom_mail(
+                'Sublimall.org account creation confirmation',
+                member.email,
+                'registration',
+                {'registration_link': urljoin(
+                    settings.SITE_URL,
+                    reverse(
+                        'registration-confirmation',
+                        args=[member.id, member.registration_key]))})
+
         except Exception:
             logger.error(
                 'Registration unhandled exception',
@@ -241,10 +237,17 @@ class AccountDeleteView(View, LoginRequiredMixin):
             messages.warning(request, "Impossible to remove staff account.")
             return HttpResponseRedirect(reverse('account'))
 
+        email = request.user.email
         request.user.package_set.all().delete()
         request.user.delete()
         messages.success(
             request, "Your account has been removed with success. See you soon!")
+
+        send_custom_mail(
+            'Sublimall.org account deleted',
+            email,
+            'account-deleted',
+            {'feedback_email': settings.FROM_EMAIL})
         return HttpResponseRedirect(reverse('home'))
 
 
@@ -272,20 +275,17 @@ class PasswordRecoveryView(View):
         member.password_key = get_hash()
         member.save()
 
-        send_mail(
-            'Sublimall password recovery',
-            'Hi,\nClick here to set a new password:\n'
-            '%s\n\n'
-            "Let's go to documentation to learn how to use Sublimall plugin.\n"
-            "%s\nBye!" % (
+        send_custom_mail(
+            'Sublimall.org password recovery',
+            member.email,
+            'password-recovery',
+            {'password_recovery_link': (
                 urljoin(
                     settings.SITE_URL,
                     reverse(
                         'password-recovery-confirmation',
                         args=[member.id, member.password_key])),
-                urljoin(settings.SITE_URL, reverse('docs'))),
-            settings.FROM_EMAIL,
-            [email])
+                urljoin(settings.SITE_URL, reverse('docs')))})
 
         messages.info(request, msg)
         return HttpResponseRedirect(reverse('login'))
