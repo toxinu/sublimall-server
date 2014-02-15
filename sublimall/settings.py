@@ -51,7 +51,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.tz',
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
-    'sublimall.notifications.context_processors.notifications'
+    'sublimall.notifications.context_processors.notifications',
+    'sublimall.context_processors.analytics'
 )
 
 ROOT_URLCONF = 'sublimall.urls'
