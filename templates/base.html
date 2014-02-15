@@ -16,6 +16,7 @@
       <div class="header">
         <ul class="nav nav-pills pull-right">
           <li class="{% navactive request 'home' %}"><a href="/#">Home</a></li>
+          <li><a href="https://github.com/socketubs/Sublimall" target="_blank">Github</a></li>
           <li class="{% navactive request 'docs' %}"><a href="{% url 'docs' %}">Docs</a></li>
           {% if user.is_authenticated %}
             <li class="{% navactive request 'account' %}"><a href="{% url 'account' %}">Account</a></li>
