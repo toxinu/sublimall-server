@@ -8,6 +8,7 @@ from django.views.generic import TemplateView
 from .storage.views import DeletePackageView
 from .storage.views import DeletePackageAPIView
 from .storage.views import UploadPackageAPIView
+from .storage.views import MaxPackageSizeAPIView
 from .storage.views import DownloadPackageAPIView
 
 from .accounts.views import LoginView
@@ -30,6 +31,7 @@ urlpatterns = patterns(
     url(r'^api/upload/$', UploadPackageAPIView.as_view(), name='api-upload'),
     url(r'^api/retrieve/$', DownloadPackageAPIView.as_view(), name='api-download'),
     url(r'^api/delete/$', DeletePackageAPIView.as_view(), name='api-delete'),
+    url(r'^api/max-package-size/$', MaxPackageSizeAPIView.as_view(), name='api-max-package-size'),
     url(r'^delete/package/(?P<pk>\d+)/$', DeletePackageView.as_view(), name='delete-package'),
     url(r'^$', TemplateView.as_view(template_name="home.html"), name='home'),
     url(r'^login/$', LoginView.as_view(), name='login'),
