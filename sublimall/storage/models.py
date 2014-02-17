@@ -12,7 +12,7 @@ class Package(models.Model):
     platform = models.CharField(max_length=30, blank=True, null=True)
     arch = models.CharField(max_length=20, blank=True, null=True)
     update = models.DateTimeField(auto_now=True)
-    package = models.FileField(upload_to='packages')
+    package = models.FileField(upload_to=settings.PACKAGES_UPLOAD_TO)
 
     def __str__(self):
         return self.__unicode__()
