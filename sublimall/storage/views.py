@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+import os
 import json
+from io import BytesIO
+from django.conf import settings
 from django.db import transaction
 from django.shortcuts import render
 from django.views.generic import View
@@ -9,6 +12,8 @@ from django.http import HttpResponseNotFound
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseBadRequest
 from django.core.urlresolvers import reverse
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
 from django.core.exceptions import ValidationError
 
 from .models import Package
@@ -19,26 +24,13 @@ from sublimall.mixins import LoginRequiredMixin
 class UploadPackageAPIView(APIMixin, View):
     @transaction.commit_on_success
     def post(self, request, *args, **kwargs):
-        email = request.FILES.get('email')
-        api_key = request.FILES.get('api_key')
-        version = request.FILES.get('version')
-        platform = request.FILES.get('platform')
-        arch = request.FILES.get('arch')
-        package = request.FILES.get('package')
-        package_size = None
-
-        if email:
-            email = email.read()
-        if api_key:
-            api_key = api_key.read()
-        if version:
-            version = version.read()
-        if platform:
-            platform = platform.read()
-        if arch:
-            arch = arch.read()
-        if package:
-            package_size = package.seek(0, 2)
+        email = request.POST.get('email')
+        api_key = request.POST.get('api_key')
+        version = request.POST.get('version')
+        platform = request.POST.get('platform')
+        arch = request.POST.get('arch')
+        package = request.POST.get('package')
+        package_size = len(package.encode('utf-8'))
 
         if not email or not api_key or not package_size or not version:
             message = {'success': False, 'errors': []}
@@ -69,12 +61,21 @@ class UploadPackageAPIView(APIMixin, View):
                 json.dumps(
                     {'success': False, 'errors': ['Bad version. Must be 2 or 3.']}))
 
+        # upload_to_path = os.path.join(
+        #     default_storage.location, settings.PACKAGES_UPLOAD_TO)
+        # if not os.path.exists(upload_to_path):
+        #     os.makedirs(upload_to_path)
+
+        # package_path = default_storage.save(
+        #     os.path.join(upload_to_path, 'package_%s' % ),
+        #     ContentFile(package))
+
         new_package = Package(
             member=member,
             version=version,
             platform=platform,
             arch=arch,
-            package=package)
+            package=BytesIO(package))
         try:
             new_package.full_clean()
         except ValidationError as err:
@@ -174,3 +175,24 @@ class DeletePackageAPIView(APIMixin, View):
 
         package.delete()
         return HttpResponse({'success': True})
+
+
+class MaxPackageSizeAPIView(APIMixin, View):
+    def post(self, request):
+        email = request.POST.get('email')
+
+        api_key = request.POST.get('api_key')
+        if not email or not api_key:
+            message = {'success': False, 'errors': []}
+            if not email:
+                message['errors'].append('Email is mandatory.')
+            if not api_key:
+                message['errors'].append('API key is mandatory.')
+            return HttpResponseBadRequest(json.dumps(message))
+
+        member = self.get_member(email, api_key)
+        if member is None:
+            return HttpResponseForbidden(
+                json.dumps({'success': False, 'errors': ['Bad credentials.']}))
+
+        return HttpResponse({'success': True, 'output': settings.MAX_PACKAGE_SIZE})
