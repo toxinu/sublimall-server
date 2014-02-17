@@ -24,7 +24,7 @@ class UploadPackageAPIView(APIMixin, View):
         version = request.FILES.get('version')
         platform = request.FILES.get('platform')
         arch = request.FILES.get('arch')
-        package = request.FILES.get('package')
+        package_file = request.FILES.get('package')
         package_size = None
 
         if email:
@@ -37,8 +37,8 @@ class UploadPackageAPIView(APIMixin, View):
             platform = platform.read()
         if arch:
             arch = arch.read()
-        if package:
-            package_size = package.seek(0, 2)
+        if package_file:
+            package_size = package_file.seek(0, 2)
 
         if not email or not api_key or not package_size or not version:
             message = {'success': False, 'errors': []}
@@ -69,25 +69,33 @@ class UploadPackageAPIView(APIMixin, View):
                 json.dumps(
                     {'success': False, 'errors': ['Bad version. Must be 2 or 3.']}))
 
-        new_package = Package(
-            member=member,
-            version=version,
-            platform=platform,
-            arch=arch,
-            package=package)
         try:
-            new_package.full_clean()
+            package = member.package_set.get(version=version)
+        except Package.DoesNotExist:
+            package = None
+
+        if package:
+            package.member = member
+            package.version = version
+            package.platform = platform
+            package.arch = arch
+            package.package = package_file
+        else:
+            package = Package(
+                member=member,
+                version=version,
+                platform=platform,
+                arch=arch,
+                package=package_file)
+
+        try:
+            package.full_clean()
         except ValidationError as err:
             return HttpResponseBadRequest(
                 json.dumps(
                     {'success': False, 'errors': err.messages}))
 
-        new_package.save()
-
-        old_package = member.package_set.exclude(
-            id=new_package.id).filter(version=version)
-        if old_package.exists():
-            old_package.delete()
+        package.save()
 
         return HttpResponse(json.dumps({'success': True}), status=201)
 
