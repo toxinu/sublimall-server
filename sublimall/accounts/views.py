@@ -279,13 +279,10 @@ class PasswordRecoveryView(View):
             'Sublimall.org password recovery',
             member.email,
             'password-recovery',
-            {'password_recovery_link': (
-                urljoin(
-                    settings.SITE_URL,
-                    reverse(
-                        'password-recovery-confirmation',
-                        args=[member.id, member.password_key])),
-                urljoin(settings.SITE_URL, reverse('docs')))})
+            {
+                'password_recovery_link': urljoin(settings.SITE_URL, reverse(
+                    'password-recovery-confirmation',
+                    args=[member.id, member.password_key]))})
 
         messages.info(request, msg)
         return HttpResponseRedirect(reverse('login'))
