@@ -27,7 +27,7 @@ class Package(models.Model):
         return self.package.file.size
 
     def clean(self):
-        if self.package and default_storage.exists(self.package.path):
+        if self.package:
             if self.package.file.size > settings.MAX_PACKAGE_SIZE:
                 raise ValidationError(
                     'Package size too big. Got %s (limit is %s).' % (
