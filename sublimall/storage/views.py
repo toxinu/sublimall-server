@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import os
 import json
 from django.conf import settings
 from django.db import transaction
@@ -10,10 +9,7 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseBadRequest
-from django.core.files import File
 from django.core.urlresolvers import reverse
-from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
 from django.core.exceptions import ValidationError
 
 from .models import Package
@@ -24,13 +20,26 @@ from sublimall.mixins import LoginRequiredMixin
 class UploadPackageAPIView(APIMixin, View):
     @transaction.commit_on_success
     def post(self, request, *args, **kwargs):
-        email = request.POST.get('email')
-        api_key = request.POST.get('api_key')
-        version = request.POST.get('version')
-        platform = request.POST.get('platform')
-        arch = request.POST.get('arch')
-        package_content = request.POST.get('package')
-        package_size = len(package_content.encode('utf-8'))
+        email = request.FILES.get('email')
+        api_key = request.FILES.get('api_key')
+        version = request.FILES.get('version')
+        platform = request.FILES.get('platform')
+        arch = request.FILES.get('arch')
+        package_file = request.FILES.get('package')
+        package_size = None
+
+        if email:
+            email = email.read()
+        if api_key:
+            api_key = api_key.read()
+        if version:
+            version = version.read()
+        if platform:
+            platform = platform.read()
+        if arch:
+            arch = arch.read()
+        if package_file:
+            package_size = package_file.seek(0, 2)
 
         if not email or not api_key or not package_size or not version:
             message = {'success': False, 'errors': []}
@@ -61,47 +70,24 @@ class UploadPackageAPIView(APIMixin, View):
                 json.dumps(
                     {'success': False, 'errors': ['Bad version. Must be 2 or 3.']}))
 
-        upload_to_path = os.path.join(
-            default_storage.location, settings.PACKAGES_UPLOAD_TO)
-
-        if not os.path.exists(upload_to_path):
-            os.makedirs(upload_to_path)
-
         try:
             package = member.package_set.get(version=version)
         except Package.DoesNotExist:
             package = None
 
         if package:
-            print('*** 1')
             package.member = member
             package.version = version
             package.platform = platform
             package.arch = arch
+            package.package = package_file
         else:
-            print('*** 2')
             package = Package(
                 member=member,
                 version=version,
                 platform=platform,
-                arch=arch)
-
-
-
-        if package.package and default_storage.exists(package.package.path):
-            print('*** 3')
-            package.package.file.open('wb')
-            package.package.file.write(package_content.encode('utf-8'))
-        else:
-            print('*** 4')
-            package.full_clean()
-            package.save()
-            package_path = default_storage.save(
-                os.path.join(upload_to_path, 'package_%s' % package.pk),
-                ContentFile(package_content))
-            package_file = File(default_storage.open(package_path))
-            package.package = package_file
-            package.path = package_path
+                arch=arch,
+                package=package_file)
 
         try:
             package.full_clean()
