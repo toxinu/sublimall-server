@@ -62,7 +62,7 @@
     ////////////////////////////
     //// Sublimall settings ////
     ////////////////////////////
-    "api_root": "http://sublimall.org",
+    "api_root_url": "http://sublimall.org",
     "api_upload_url": "/api/upload/",
     "api_retrieve_url": "/api/retrieve/",
 
@@ -71,14 +71,21 @@
     ///////////////////////
     "email": "",
     "api_key": "",
+    // Paths must be: "Packages/SublimeCodeIntel" or "Installed Packages/Sublimall"
+    "ignore_packages": [],
     // Set true if you want to exclude packages managed by Package Control
     "exclude_from_package_control": false,
     // Set false if you don't want to encrypt your configuration
     "encrypt": true,
     // Upload timeout in seconds
-    "http_upload_timeout": 60,
-    // 7zip binary path (Sublimall will try to find it itself)
-    "7za_path": ""
+    "http_upload_timeout": 120,
+    // Download timeout in seconds
+    "http_download_timeout": 120,
+    // Path to 7zip executable, though Sublimall tries to find it out itself
+    "7za_path": "",
+    // HTTP proxy to use for HTTP requests. Support for authentication
+    // Examples: http://user:password@host:port or http://ip:port
+    "http_proxy": ""
 }</pre>
             <p>Add you <em>email</em> and your <em>API key</em> which you can find on your <a href="{% url 'account' %}">account</a> page.</p>
             <p>If <kbd>encrypt</kbd> option is <kbd>true</kbd>, you'll prompt to a passphrase when you'll upload your configuration on Sublimall.</p>
