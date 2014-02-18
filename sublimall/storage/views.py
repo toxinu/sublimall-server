@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import json
-from io import BytesIO
 from django.conf import settings
 from django.db import transaction
 from django.shortcuts import render
@@ -11,6 +10,7 @@ from django.http import HttpResponseRedirect
 from django.http import HttpResponseNotFound
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseBadRequest
+from django.core.files import File
 from django.core.urlresolvers import reverse
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
@@ -29,8 +29,8 @@ class UploadPackageAPIView(APIMixin, View):
         version = request.POST.get('version')
         platform = request.POST.get('platform')
         arch = request.POST.get('arch')
-        package = request.POST.get('package')
-        package_size = len(package.encode('utf-8'))
+        package_content = request.POST.get('package')
+        package_size = len(package_content.encode('utf-8'))
 
         if not email or not api_key or not package_size or not version:
             message = {'success': False, 'errors': []}
@@ -61,34 +61,56 @@ class UploadPackageAPIView(APIMixin, View):
                 json.dumps(
                     {'success': False, 'errors': ['Bad version. Must be 2 or 3.']}))
 
-        # upload_to_path = os.path.join(
-        #     default_storage.location, settings.PACKAGES_UPLOAD_TO)
-        # if not os.path.exists(upload_to_path):
-        #     os.makedirs(upload_to_path)
+        upload_to_path = os.path.join(
+            default_storage.location, settings.PACKAGES_UPLOAD_TO)
 
-        # package_path = default_storage.save(
-        #     os.path.join(upload_to_path, 'package_%s' % ),
-        #     ContentFile(package))
+        if not os.path.exists(upload_to_path):
+            os.makedirs(upload_to_path)
 
-        new_package = Package(
-            member=member,
-            version=version,
-            platform=platform,
-            arch=arch,
-            package=BytesIO(package))
         try:
-            new_package.full_clean()
+            package = member.package_set.get(version=version)
+        except Package.DoesNotExist:
+            package = None
+
+        if package:
+            print('*** 1')
+            package.member = member
+            package.version = version
+            package.platform = platform
+            package.arch = arch
+        else:
+            print('*** 2')
+            package = Package(
+                member=member,
+                version=version,
+                platform=platform,
+                arch=arch)
+
+
+
+        if package.package and default_storage.exists(package.package.path):
+            print('*** 3')
+            package.package.file.open('wb')
+            package.package.file.write(package_content.encode('utf-8'))
+        else:
+            print('*** 4')
+            package.full_clean()
+            package.save()
+            package_path = default_storage.save(
+                os.path.join(upload_to_path, 'package_%s' % package.pk),
+                ContentFile(package_content))
+            package_file = File(default_storage.open(package_path))
+            package.package = package_file
+            package.path = package_path
+
+        try:
+            package.full_clean()
         except ValidationError as err:
             return HttpResponseBadRequest(
                 json.dumps(
                     {'success': False, 'errors': err.messages}))
 
-        new_package.save()
-
-        old_package = member.package_set.exclude(
-            id=new_package.id).filter(version=version)
-        if old_package.exists():
-            old_package.delete()
+        package.save()
 
         return HttpResponse(json.dumps({'success': True}), status=201)
 
