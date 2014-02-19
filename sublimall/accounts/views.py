@@ -189,7 +189,7 @@ class RegistrationView(View):
 
         messages.success(
             request,
-            "You'll received an email soon, check it to confirm "
+            "You'll receive an email soon, check it to confirm "
             "your account. See you soon!")
         return HttpResponseRedirect(reverse('login'))
 
