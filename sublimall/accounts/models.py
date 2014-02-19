@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
+from urllib.parse import urljoin
+
 from django.db import models
+from django.conf import settings
 from django.utils import timezone
+from django.core.urlresolvers import reverse
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.utils.translation import ugettext_lazy as _
 
 from .utils import get_hash
+from ..utils import send_custom_mail
 
 
 class MemberManager(BaseUserManager):
@@ -74,3 +79,21 @@ class Member(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.email
+
+    def send_registration_confirmation(self, reset_key=False):
+        if reset_key:
+            self.registration_key = get_hash()
+            self.save()
+        elif not self.registration_key:
+            self.registration_key = get_hash()
+            self.save()
+
+        send_custom_mail(
+            'Sublimall.org account creation confirmation',
+            self.email,
+            'registration',
+            {'registration_link': urljoin(
+                settings.SITE_URL,
+                reverse(
+                    'registration-confirmation',
+                    args=[self.id, self.registration_key]))})

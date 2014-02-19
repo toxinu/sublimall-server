@@ -164,15 +164,7 @@ class RegistrationView(View):
             member.full_clean()
             member.save()
 
-            send_custom_mail(
-                'Sublimall.org account creation confirmation',
-                member.email,
-                'registration',
-                {'registration_link': urljoin(
-                    settings.SITE_URL,
-                    reverse(
-                        'registration-confirmation',
-                        args=[member.id, member.registration_key]))})
+            member.send_registration_confirmation()
 
         except Exception:
             logger.error(
@@ -213,19 +205,7 @@ class ResendRegistrationView(View):
             messages.info(request, msg)
             return HttpResponseRedirect(reverse('login'))
 
-        member.registration_key = get_hash()
-        member.save()
-
-        send_custom_mail(
-            'Sublimall.org account creation confirmation',
-            member.email,
-            'registration',
-            {'registration_link': urljoin(
-                settings.SITE_URL,
-                reverse(
-                    'registration-confirmation',
-                    args=[member.id, member.registration_key]))})
-
+        member.send_registration_confirmation(reset_key=True)
         messages.info(request, msg)
         return HttpResponseRedirect(reverse('login'))
 
