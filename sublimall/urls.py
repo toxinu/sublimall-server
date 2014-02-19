@@ -19,6 +19,7 @@ from .accounts.views import MaintenanceView
 from .accounts.views import RegistrationView
 from .accounts.views import AccountDeleteView
 from .accounts.views import PasswordRecoveryView
+from .accounts.views import ResendRegistrationView
 from .accounts.views import RegistrationConfirmationView
 from .accounts.views import PasswordRecoveryConfirmationView
 
@@ -39,6 +40,7 @@ urlpatterns = patterns(
     url(r'^login/password-recovery$', PasswordRecoveryView.as_view(), name='password-recovery'),
     url(r'^login/password-recovery/(?P<pk>\d+)/(?P<key>[\w{}.-]{1,40})$', PasswordRecoveryConfirmationView.as_view(), name='password-recovery-confirmation'),
     url(r'^registration/$', RegistrationView.as_view(), name='registration'),
+    url(r'^registration/resend$', ResendRegistrationView.as_view(), name='registration-resend'),
     url(r'^registration/(?P<pk>\d+)/(?P<key>[\w{}.-]{1,40})$', RegistrationConfirmationView.as_view(), name='registration-confirmation'),
     url(r'^account/$', AccountView.as_view(), name='account'),
     url(r'^account/delete$', AccountDeleteView.as_view(), name='account-delete'),

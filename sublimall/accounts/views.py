@@ -194,6 +194,42 @@ class RegistrationView(View):
         return HttpResponseRedirect(reverse('login'))
 
 
+class ResendRegistrationView(View):
+    def get(self, request):
+        if request.user.is_authenticated():
+            return HttpResponseRedirect(reverse('account'))
+        return render(request, 'resend-registration-link.html')
+
+    def post(self, request):
+        if request.user.is_authenticated():
+            return HttpResponseRedirect(reverse('account'))
+
+        email = request.POST.get('email')
+        msg = "If you give me a valid email, you'll received an email with some help."
+
+        try:
+            member = Member.objects.get(email=email)
+        except Member.DoesNotExist:
+            messages.info(request, msg)
+            return HttpResponseRedirect(reverse('login'))
+
+        member.registration_key = get_hash()
+        member.save()
+
+        send_custom_mail(
+            'Sublimall.org account creation confirmation',
+            member.email,
+            'registration',
+            {'registration_link': urljoin(
+                settings.SITE_URL,
+                reverse(
+                    'registration-confirmation',
+                    args=[member.id, member.registration_key]))})
+
+        messages.info(request, msg)
+        return HttpResponseRedirect(reverse('login'))
+
+
 class RegistrationConfirmationView(View):
     def get(self, request, key, pk):
         try:
@@ -203,11 +239,21 @@ class RegistrationConfirmationView(View):
 
         if member is None:
             return render(
-                request, 'error.html', {'title': 'Error', 'error': 'Invalid key.'})
+                request,
+                'error.html',
+                {'title': 'Error', 'error': 'Invalid key or account already active.'})
+
+        if member.is_active:
+            messages.info(request, "Your account is already active.")
+            member.registration_key = None
+            member.save()
+            return HttpResponseRedirect(reverse('login'))
 
         member.is_active = True
         member.registration_key = None
         member.save()
+
+        messages.success(request, 'Your account is now active.')
 
         return HttpResponseRedirect(reverse('login'))
 
@@ -228,7 +274,7 @@ class AccountView(LoginRequiredMixin, View):
 
 
 class AccountDeleteView(View, LoginRequiredMixin):
-    def get(self, request, **kwargs):
+    def get(self, request):
         return render(request, 'account-delete.html')
 
     @transaction.commit_on_success
