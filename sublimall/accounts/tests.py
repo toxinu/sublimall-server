@@ -353,7 +353,7 @@ class RegistrationTestCase(TestCase):
         r = self.c.get(reverse(
             'registration-confirmation', args=[100, member.registration_key]))
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.context['error'], 'Invalid key.')
+        self.assertEqual(r.context['error'], 'Invalid key or account already active.')
 
         member = Member.objects.get(email=data.get('email'))
         self.assertFalse(member.is_active)
@@ -376,7 +376,7 @@ class RegistrationTestCase(TestCase):
             'registration-confirmation',
             args=[member.id, member.registration_key[:-4] + "test"]))
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.context['error'], 'Invalid key.')
+        self.assertEqual(r.context['error'], 'Invalid key or account already active.')
 
         self.assertFalse(member.is_active)
 
