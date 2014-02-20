@@ -57,6 +57,9 @@ class UploadPackageAPIView(APIMixin, View):
         if member is None:
             return HttpResponseForbidden(
                 json.dumps({'success': False, 'errors': ['Bad credentials.']}))
+        if not member.is_active:
+            return HttpResponseForbidden(
+                json.dumps({'success': False, 'errors': ['Account not active.']}))
 
         try:
             version = int(version)
@@ -121,6 +124,9 @@ class DownloadPackageAPIView(APIMixin, View):
         if member is None:
             return HttpResponseForbidden(
                 json.dumps({'success': False, 'errors': ['Bad credentials.']}))
+        if not member.is_active:
+            return HttpResponseForbidden(
+                json.dumps({'success': False, 'errors': ['Account not active.']}))
 
         try:
             package = member.package_set.get(version=version)
