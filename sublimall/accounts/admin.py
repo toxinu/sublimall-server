@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
+from django.core.mail import get_connection
 
 from .models import Member
 from ..storage.models import Package
@@ -21,7 +22,8 @@ class MemberAdmin(admin.ModelAdmin):
     inlines = [PackageInline, ]
 
     def resend_registration(self, request, queryset):
-        for member in queryset.all():
-            member.send_registration_confirmation(reset_key=True)
+        connection = get_connection()
+        for member in queryset.all().only('registration_key', 'email', 'id'):
+            member.send_registration_confirmation(reset_key=True, connection=connection)
 
 admin.site.register(Member, MemberAdmin)

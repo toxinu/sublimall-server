@@ -80,7 +80,7 @@ class Member(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.email
 
-    def send_registration_confirmation(self, reset_key=False):
+    def send_registration_confirmation(self, reset_key=False, connection=None):
         if reset_key:
             self.registration_key = get_hash()
             self.save()
@@ -96,4 +96,5 @@ class Member(AbstractBaseUser, PermissionsMixin):
                 settings.SITE_URL,
                 reverse(
                     'registration-confirmation',
-                    args=[self.id, self.registration_key]))})
+                    args=[self.id, self.registration_key]))},
+            connection=connection)
