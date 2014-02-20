@@ -22,8 +22,20 @@
                     <ul class="list-unstyled">
                         <li><strong>Email</strong> : {{ email }}</li>
                         <li><strong>API key</strong> : <kbd>{{ api_key }}</kbd> </li>
+                        <li><strong>Storage limit</strong> : <kbd>{{ storage_limit|filesizeformat }}</kbd> </li>
                     </ul>
+                    {% if is_donator %}
+                        <h2>Your donations: </h2>
+                        <ul class="list-unstyled">
+                            {% for donation in donations %}
+                                <li><strong>{{ donation.amount }}</strong> at {{ donation.date }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
                     <p><a href="{% url 'account-new-api-key' %}" class="btn btn-warning btn-xs">Generate new API key</a></p>
+                    {% if not is_donator %}
+                        <p><a href="{% url 'donations' %}" class="btn btn-success btn-xs">Need more storage ?</a></p>
+                    {% endif %}
                     {% if not is_staff %}
                         <p><a href="{% url 'account-delete' %}" class="btn btn-danger btn-xs">Delete your account</a></p>
                     {% endif %}

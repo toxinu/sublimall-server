@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block content %}
+  <script src="https://checkout.stripe.com/checkout.js"></script>
+  <script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">Want to help Sublimall ?</h3>
+    </div>
+    <div class="panel-body">
+      <p>I'll make Sublimall on my free time, paid server and storage with my own money, a donation will make Sublimall existing and having more features.</p>
+      <p>You are a Sublimall contributor.</p>
+      {% if email %}
+        <p>This donation will be link with your account (<small>{{ email }}</small>). So you'll have a <strong>upgraded account</strong>, with <strong>more storage</strong> and soon <strong>more features</strong>.</p>
+      {% else %}
+        <p>This donation won't be link to any account, because your are not logged in.</p>
+      {% endif %}
+      <hr>
+      <form role="form" class="form-horizontal" onsubmit="return false;">
+        {% if email %}
+          <input type="hidden" class="form-control" id="email" value="{{ email }}">
+        {% else %}
+          <div class="form-group">
+            <label for="email" class="col-sm-2 control-label">Email</label>
+            <div class="col-sm-4">
+              <input type="email" class="form-control" id="email" placeholder="foo@bar.com">
+            </div>
+          </div>
+        {% endif %}
+        <div class="form-group">
+          <label for="amount" class="col-sm-2 control-label">Amount (in dollars)</label>
+          <div class="col-sm-1">
+            <input type="text" class="form-control" id="amount" value="5">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-sm-offset-2 col-sm-10">
+            <button class="btn btn-success" id="donate-button">Donate</button>
+          </div>
+        </div>
+      </form>
+      <script>
+        $(function() {
+          var handler = StripeCheckout.configure({
+            key: '{{ STRIPE_PUBLIC_KEY }}',
+            image: "{% static 'images/visual_logo.png' %}",
+            token: function(token, args) {
+              $.post("{% url 'donations' %}", {token: token.id, email: document.getElementById('email').value, amount: document.getElementById('amount').value * 100}, 'json')
+                .always(function(data) {location.reload()});
+            }
+          });
+
+          document.getElementById('donate-button').addEventListener('click', function(e) {
+            handler.open({
+              name: 'Sublimall',
+              currency: 'eur',
+              email: document.getElementById('email').value,
+              description: 'Donate to Sublimall for life ($' + document.getElementById('amount').value + '.00)',
+              amount: document.getElementById('amount').value * 100
+            });
+            e.preventDefault();
+          });
+        });
+      </script>
+      <hr>
+      <p>Or just give a smaller donation with Gittip or Flattr. <strong>These donations won't be linked to your account</strong>.</p>
+      <script type="text/javascript">
+        /* <![CDATA[ */
+        (function() {
+            var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
+            s.type = 'text/javascript';
+            s.async = true;
+            s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto';
+            t.parentNode.insertBefore(s, t);
+        })();
+        /* ]]> */
+      </script>
+      <script data-gittip-username="Socketubs"
+        data-gittip-widget="button"
+        src="//gttp.co/v1.js"></script>
+      <a class="FlattrButton" style="display:none;" rev="flattr;button:compact;" href="http://github.com/socketubs/Sublimall"></a>
+      <p><strong>I really thank you.</strong></p>
+      <p>Geoffrey.</p>
+    </div>
+  </div>
+{% endblock %}

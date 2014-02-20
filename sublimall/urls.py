@@ -5,6 +5,8 @@ from django.conf.urls import include
 from django.conf.urls import patterns
 from django.views.generic import TemplateView
 
+from .donations.views import DonationsView
+
 from .storage.views import DeletePackageView
 from .storage.views import DeletePackageAPIView
 from .storage.views import UploadPackageAPIView
@@ -45,6 +47,6 @@ urlpatterns = patterns(
     url(r'^account/$', AccountView.as_view(), name='account'),
     url(r'^account/delete$', AccountDeleteView.as_view(), name='account-delete'),
     url(r'^account/new_api_key$', GenerateAPIKey.as_view(), name='account-new-api-key'),
-    url(r'^support$', TemplateView.as_view(template_name="support.html"), name='support'),
     url(r'^docs$', TemplateView.as_view(template_name="docs.html"), name='docs'),
+    url(r'^donate$', DonationsView.as_view(), name='donations'),
 )

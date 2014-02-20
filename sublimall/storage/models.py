@@ -28,11 +28,11 @@ class Package(models.Model):
 
     def clean(self):
         if self.package:
-            if self.package.file.size > settings.MAX_PACKAGE_SIZE:
+            if self.package.file.size > self.member.get_storage_limit():
                 raise ValidationError(
                     'Package size too big. Got %s (limit is %s).' % (
                         int(self.package.file.size / 1024 / 1024),
-                        settings.MAX_PACKAGE_SIZE / 1024 / 1024))
+                        self.member.get_storage_limit() / 1024 / 1024))
         super(Package, self).clean()
 
 

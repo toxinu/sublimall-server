@@ -80,6 +80,17 @@ class Member(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.email
 
+    def is_donator(self):
+        for donation in self.donation_set.filter(charge_id__isnull=False):
+            if donation.paid:
+                return True
+        return False
+
+    def get_storage_limit(self):
+        if self.is_donator():
+            return settings.MAX_PACKAGE_SIZE_DONATE
+        return settings.MAX_PACKAGE_SIZE
+
     def send_registration_confirmation(self, reset_key=False, connection=None):
         if reset_key:
             self.registration_key = get_hash()

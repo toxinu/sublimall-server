@@ -247,6 +247,9 @@ class AccountView(LoginRequiredMixin, View):
             request,
             'account.html',
             {
+                'storage_limit': member.get_storage_limit(),
+                'is_donator': member.is_donator,
+                'donations': member.donation_set.filter(paid=True),
                 'is_staff': member.is_staff,
                 'packages': packages,
                 'api_key': member.api_key,
