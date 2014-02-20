@@ -45,5 +45,6 @@ urlpatterns = patterns(
     url(r'^account/$', AccountView.as_view(), name='account'),
     url(r'^account/delete$', AccountDeleteView.as_view(), name='account-delete'),
     url(r'^account/new_api_key$', GenerateAPIKey.as_view(), name='account-new-api-key'),
+    url(r'^support$', TemplateView.as_view(template_name="support.html"), name='support'),
     url(r'^docs$', TemplateView.as_view(template_name="docs.html"), name='docs'),
 )

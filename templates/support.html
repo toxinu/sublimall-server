@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+    <script type="text/javascript">
+        /* <![CDATA[ */
+        (function() {
+            var s = document.createElement('script'), t = document.getElementsByTagName('script')[0];
+            s.type = 'text/javascript';
+            s.async = true;
+            s.src = 'http://api.flattr.com/js/0.6/load.js?mode=auto';
+            t.parentNode.insertBefore(s, t);
+        })();
+        /* ]]> */
+    </script>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Want to support Sublimall ?</h3>
+        </div>
+        <div class="panel-body">
+            <p>You'll help Sublimall existing and adding new exciting features!</p>
+            <p>Donation via Gittip or Flattr.</p>
+            <script data-gittip-username="Socketubs"
+                data-gittip-widget="button"
+                src="//gttp.co/v1.js"></script>
+            <a class="FlattrButton" style="display:none;" rev="flattr;button:compact;" href="http://github.com/socketubs/Sublimall"></a>
+            <p>Thank you,<br />Geoffrey.</p>
+        </div>
+    </div>
+{% endblock %}
