@@ -4,7 +4,7 @@ Sublimall
 .. image:: https://magnum.travis-ci.com/socketubs/sublimall-server.png?token=8Rz7PXRsaTFUz7F3LJzS&branch=master
     :target: https://magnum.travis-ci.com/socketubs/sublimall-server
 
-Sublimall is Python 3.3 server behind Sublimall SublimeText plugin.
+Sublimall is Python 3.3 server behind Sublimall_ SublimeText plugin.
 
 
 Installation
@@ -31,3 +31,5 @@ Sublimall server is tested at ~90% coverage.
     pip install coverage
     make coverage
     firefox htmlcov/index.html
+
+.. _Sublimall: https://github.com/socketubs/Sublimall
