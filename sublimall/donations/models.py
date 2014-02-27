@@ -6,7 +6,8 @@ from django.core.exceptions import ValidationError
 
 from ..accounts.models import Member
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
+if hasattr(settings, 'STRIPE_SECRET_KEY'):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class Donation(models.Model):

@@ -19,7 +19,8 @@ class DonationsView(APIMixin, View):
         context = {}
         if request.user.is_authenticated():
             context.update({'email': request.user.email})
-        context.update({'STRIPE_PUBLIC_KEY': settings.STRIPE_PUBLIC_KEY})
+        if hasattr(settings, 'STRIPE_PUBLIC_KEY'):
+            context.update({'STRIPE_PUBLIC_KEY': settings.STRIPE_PUBLIC_KEY})
         return render(request, 'donations.html', context)
 
     def post(self, request):
