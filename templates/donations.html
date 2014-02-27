@@ -18,53 +18,65 @@
         <p>This donation won't be link to any account, because your are not logged in.</p>
       {% endif %}
       <hr>
-      <form role="form" class="form-horizontal" onsubmit="return false;">
-        {% if email %}
-          <input type="hidden" class="form-control" id="email" value="{{ email }}">
-        {% else %}
+      {% if STRIPE_PUBLIC_KEY %}
+        <h4>With your credit card</h4>
+        <p>With your credit card, your account will be linked automatically.</p>
+        <form role="form" class="form-horizontal" onsubmit="return false;">
+          {% if email %}
+            <input type="hidden" class="form-control" id="email" value="{{ email }}">
+          {% else %}
+            <div class="form-group">
+              <label for="email" class="col-sm-2 control-label">Email</label>
+              <div class="col-sm-4">
+                <input type="email" class="form-control" id="email" placeholder="foo@bar.com">
+              </div>
+            </div>
+          {% endif %}
           <div class="form-group">
-            <label for="email" class="col-sm-2 control-label">Email</label>
-            <div class="col-sm-4">
-              <input type="email" class="form-control" id="email" placeholder="foo@bar.com">
+            <label for="amount" class="col-sm-2 control-label">Amount (in dollars)</label>
+            <div class="col-sm-1">
+              <input type="text" class="form-control" id="amount" value="5">
+            </div>
+            <div class="col-sm-1">
+              <button class="btn btn-success" id="donate-button">Donate</button>
             </div>
           </div>
-        {% endif %}
-        <div class="form-group">
-          <label for="amount" class="col-sm-2 control-label">Amount (in dollars)</label>
-          <div class="col-sm-1">
-            <input type="text" class="form-control" id="amount" value="5">
-          </div>
-        </div>
-        <div class="form-group">
-          <div class="col-sm-offset-2 col-sm-10">
-            <button class="btn btn-success" id="donate-button">Donate</button>
-          </div>
-        </div>
-      </form>
-      <script>
-        $(function() {
-          var handler = StripeCheckout.configure({
-            key: '{{ STRIPE_PUBLIC_KEY }}',
-            image: "{% static 'images/visual_logo.png' %}",
-            token: function(token, args) {
-              $.post("{% url 'donations' %}", {token: token.id, email: document.getElementById('email').value, amount: document.getElementById('amount').value * 100}, 'json')
-                .always(function(data) {location.reload()});
-            }
-          });
-
-          document.getElementById('donate-button').addEventListener('click', function(e) {
-            handler.open({
-              name: 'Sublimall',
-              currency: 'eur',
-              email: document.getElementById('email').value,
-              description: 'Donate to Sublimall for life ($' + document.getElementById('amount').value + '.00)',
-              amount: document.getElementById('amount').value * 100
+        </form>
+        <script>
+          $(function() {
+            var handler = StripeCheckout.configure({
+              key: '{{ STRIPE_PUBLIC_KEY }}',
+              image: "{% static 'images/visual_logo.png' %}",
+              token: function(token, args) {
+                $.post("{% url 'donations' %}", {token: token.id, email: document.getElementById('email').value, amount: document.getElementById('amount').value * 100}, 'json')
+                  .always(function(data) {location.reload()});
+              }
             });
-            e.preventDefault();
+
+            document.getElementById('donate-button').addEventListener('click', function(e) {
+              handler.open({
+                name: 'Sublimall',
+                currency: 'eur',
+                email: document.getElementById('email').value,
+                description: 'Donate to Sublimall for life ($' + document.getElementById('amount').value + '.00)',
+                amount: document.getElementById('amount').value * 100
+              });
+              e.preventDefault();
+            });
           });
-        });
-      </script>
+        </script>
+        <hr>
+      {% endif %}
+      <h4>With Paypal</h4>
+      <p>For Paypal, your account will be linked manually.</p>
+      <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+        <input type="hidden" name="cmd" value="_s-xclick">
+        <input type="hidden" name="hosted_button_id" value="93CWTEFQL8B6Q">
+        <input type="image" src="https://www.paypalobjects.com/en_GB/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal – The safer, easier way to pay online.">
+        <img alt="" border="0" src="https://www.paypalobjects.com/fr_FR/i/scr/pixel.gif" width="1" height="1">
+      </form>
       <hr>
+      <h4>Other</h4>
       <p>Or just give a smaller donation with Gittip or Flattr. <strong>These donations won't be linked to your account</strong>.</p>
       <script type="text/javascript">
         /* <![CDATA[ */
@@ -81,6 +93,8 @@
         data-gittip-widget="button"
         src="//gttp.co/v1.js"></script>
       <a class="FlattrButton" style="display:none;" rev="flattr;button:compact;" href="http://github.com/socketubs/Sublimall"></a>
+      <br />
+      <br />
       <p><strong>I really thank you for your implication :-).</strong></p>
       <p>Geoffrey.</p>
     </div>
