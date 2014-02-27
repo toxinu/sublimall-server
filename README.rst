@@ -1,11 +1,16 @@
 Sublimall
 =========
 
-.. image:: https://magnum.travis-ci.com/socketubs/sublimall-server.png?token=8Rz7PXRsaTFUz7F3LJzS&branch=master
-    :target: https://magnum.travis-ci.com/socketubs/sublimall-server
+.. image:: https://coveralls.io/repos/socketubs/sublimall-server/badge.png
+  :target: https://coveralls.io/r/socketubs/sublimall-server
+
+.. image:: https://drone.io/github.com/socketubs/sublimall-server/status.png
+  :target: https://drone.io/github.com/socketubs/sublimall-server/latest
+
+.. image:: https://badges.gitter.im/socketubs/Sublimall.png
+  :target: https://gitter.im/socketubs/Sublimall
 
 Sublimall is Python 3.3 server behind Sublimall_ SublimeText plugin.
-
 
 Installation
 ~~~~~~~~~~~~
