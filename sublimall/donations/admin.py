@@ -6,6 +6,7 @@ from .models import Donation
 
 class DonationAdmin(admin.ModelAdmin):
     list_display = ('get_member', 'get_amount')
+    raw_id_fields = ('member', )
 
     def get_amount(self, obj):
         return "%s $" % (obj.amount / 100)
