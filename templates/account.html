@@ -25,10 +25,10 @@
                         <li><strong>Storage limit</strong> : <kbd>{{ storage_limit|filesizeformat }}</kbd> </li>
                     </ul>
                     {% if is_donator %}
-                        <h2>Your donations: </h2>
+                        <h2>Your donations</h2>
                         <ul class="list-unstyled">
                             {% for donation in donations %}
-                                <li><strong>{{ donation.amount }}</strong> at {{ donation.date }}</li>
+                                <li><strong>{{ donation.amount }} $</strong> at {{ donation.date }}</li>
                             {% endfor %}
                         </ul>
                     {% endif %}
