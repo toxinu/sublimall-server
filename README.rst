@@ -4,9 +4,6 @@ Sublimall
 .. image:: https://coveralls.io/repos/socketubs/sublimall-server/badge.png
   :target: https://coveralls.io/r/socketubs/sublimall-server
 
-.. image:: https://drone.io/github.com/socketubs/sublimall-server/status.png
-  :target: https://drone.io/github.com/socketubs/sublimall-server/latest
-
 .. image:: https://badges.gitter.im/socketubs/Sublimall.png
   :target: https://gitter.im/socketubs/Sublimall
 
