@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import division
 import stripe
 from django.db import models
 from django.conf import settings
@@ -29,6 +30,9 @@ class Donation(models.Model):
             return self.member.email
         else:
             return self.email
+
+    def get_formated_amount(self):
+        return self.amount / 100
 
     def charge(self):
         c = stripe.Charge.create(
