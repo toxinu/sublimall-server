@@ -31,7 +31,7 @@ class Donation(models.Model):
         else:
             return self.email
 
-    def get_formated_amount(self):
+    def get_formatted_amount(self):
         return self.amount / 100
 
     def charge(self):
