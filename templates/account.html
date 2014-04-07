@@ -28,7 +28,7 @@
                         <h2>Your donations</h2>
                         <ul class="list-unstyled">
                             {% for donation in donations %}
-                                <li><strong>{{ donation.get_formatted_amount }} $</strong> at {{ donation.date }}</li>
+                                <li><strong>{{ donation.get_formatted_amount }} $</strong> at {{ donation.date }} via {{ donation.get_provider }}</li>
                             {% endfor %}
                         </ul>
                     {% endif %}
