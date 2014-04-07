@@ -43,3 +43,15 @@ class Donation(models.Model):
         self.charge_id = c.id
         self.paid = c.paid
         self.save()
+
+    def get_provider(self):
+        if self.token_id.startswith('tok_'):
+            return 'Stripe'
+        else:
+            return 'Paypal'
+
+    def get_payment_url(self):
+        if self.get_provider().lower() == 'paypal':
+            return 'https://www.paypal.com/fr/vst/id=%s' % self.token_id
+        else:
+            return 'https://manage.stripe.com/payments/%s' % self.charge_id
