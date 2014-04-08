@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import json
-from django.conf import settings
 from django.db import transaction
 from django.shortcuts import render
 from django.views.generic import View
@@ -209,4 +208,4 @@ class MaxPackageSizeAPIView(APIMixin, View):
             return HttpResponseForbidden(
                 json.dumps({'success': False, 'errors': ['Bad credentials.']}))
 
-        return HttpResponse(json.dumps({'success': True, 'output': settings.MAX_PACKAGE_SIZE}))
+        return HttpResponse(json.dumps({'success': True, 'output': member.get_storage_limit()}))
