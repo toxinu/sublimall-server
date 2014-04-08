@@ -209,4 +209,4 @@ class MaxPackageSizeAPIView(APIMixin, View):
             return HttpResponseForbidden(
                 json.dumps({'success': False, 'errors': ['Bad credentials.']}))
 
-        return HttpResponse({'success': True, 'output': settings.MAX_PACKAGE_SIZE})
+        return HttpResponse(json.dumps({'success': True, 'output': settings.MAX_PACKAGE_SIZE}))
