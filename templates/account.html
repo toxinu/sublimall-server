@@ -58,7 +58,8 @@
                                     <li><strong>System</strong> : {{ package.platform }} {{ package.arch }}</li>
                                 {% endif %}
                             </ul>
-                            <form method="post" action="{% url 'api-download' %}">
+                            <!-- TODO: Remove this hardcoded url -->
+                            <form method="post" action="http://sublimall.org{% url 'api-download' %}">
                                 <input type="hidden" value="{{ email }}" name="email">
                                 <input type="hidden" value="{{ api_key }}" name="api_key">
                                 <input type="hidden" value="{{ package.version }}" name="version">
