@@ -29,7 +29,6 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'south',
     'sublimall.accounts',
     'sublimall.storage',
     'sublimall.notifications',
@@ -81,10 +80,10 @@ USE_L10N = True
 USE_TZ = True
 
 TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'templates'))
+    os.path.join(BASE_DIR, 'templates'), )
 
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'assets'),)
+    os.path.join(BASE_DIR, 'assets'), )
 
 SITE_URL = 'http://localhost:8000'
 FROM_EMAIL = 'root@localhost'

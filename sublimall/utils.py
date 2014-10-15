@@ -9,6 +9,10 @@ def send_custom_mail(subject, to, template, context, connection=None):
     text_content = render_to_string('email/%s.txt' % template, context)
     html_content = render_to_string('email/%s.html' % template, context)
     msg = EmailMultiAlternatives(
-        subject, text_content, settings.FROM_EMAIL, [to], connection=connection)
+        subject,
+        text_content,
+        settings.FROM_EMAIL,
+        [to],
+        connection=connection)
     msg.attach_alternative(html_content, "text/html")
     msg.send()

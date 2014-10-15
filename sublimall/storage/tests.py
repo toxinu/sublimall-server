@@ -24,7 +24,8 @@ class PluginAPITestCase(TestCase):
 
     def _get_post_data(
             self,
-            fields=['email', 'api_key', 'version', 'package', 'platform', 'arch']):
+            fields=[
+                'email', 'api_key', 'version', 'package', 'platform', 'arch']):
         """
         Generate a bytes dict for upload form
         """
@@ -291,7 +292,8 @@ class PluginAPITestCase(TestCase):
 
     def test_get_delete_not_exists_package_not_logged(self):
         """
-        Get request on delete package page without logged and package doesn't exists
+        Get request on delete package page without logged
+        and package doesn't exists
         """
         r = self.c.get(reverse('delete-package', args=[6]))
         self.assertEqual(r.status_code, 302)
@@ -448,7 +450,8 @@ class PackageTestCase(TestCase):
 
     def _get_post_data(
             self,
-            fields=['email', 'api_key', 'version', 'package', 'platform', 'arch']):
+            fields=[
+                'email', 'api_key', 'version', 'package', 'platform', 'arch']):
         """
         Generate a bytes dict for upload form
         """

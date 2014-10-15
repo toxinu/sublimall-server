@@ -34,7 +34,7 @@ class MaintenanceView(TemplateView):
     template_name = "error.html"
 
     def get_context_data(self, *args, **kwargs):
-        context = super(MaintenanceView, self).get_context_data(*args, **kwargs)
+        context = super().get_context_data(*args, **kwargs)
         context['title'] = 'Sublimall is in maintenance'
         context['error'] = '<p>Sorry, Sublimall is under maintenance.</p>' \
             '<p>Try again a little later.</p><p>Socketubs.</p>'
@@ -55,7 +55,8 @@ class LoginView(FormView):
             'prefix': kwargs.get('prefix')}
 
         if self.request.method == 'POST' and kwargs.get('data'):
-            for field in ['next', 'username', 'csrfmiddlewaretoken', 'password']:
+            for field in [
+                    'next', 'username', 'csrfmiddlewaretoken', 'password']:
                 data['data'][field] = kwargs['data'].get(field)
             data['data']['username'] = data['data']['username'].lower()
         else:
@@ -96,14 +97,17 @@ class RegistrationView(View):
             return HttpResponseRedirect(reverse('account'))
         current_user_count = Member.objects.all().count()
         if current_user_count >= settings.MAX_MEMBER:
-            msg = "I'm sorry about that, don't forget that it's " \
-                "a beta version of Sublimall. <br /><strong>Registrations will " \
-                "been soon re-opened!</strong></p><p><em>Geoffrey.</em>"
+            msg = (
+                "I'm sorry about that, don't forget that it's "
+                "a beta version of Sublimall. <br /><strong>Registrations "
+                "will been soon re-opened!</strong></p><p><em>Geoffrey.</em>")
             return render(
-                request, 'error.html', {'title': 'Max registration reach', 'error': msg})
+                request,
+                'error.html',
+                {'title': 'Max registration reach', 'error': msg})
         return render(request, 'registration.html')
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def post(self, request):
         template = 'registration.html'
 
@@ -126,15 +130,20 @@ class RegistrationView(View):
 
         if not email:
             return render(
-                request, template, {"form": {'errors': "Email can't be empty."}})
+                request,
+                template,
+                {"form": {'errors': "Email can't be empty."}})
         if not password:
             return render(
-                request, template, {"form": {'errors': "Password can't be empty."}})
+                request,
+                template,
+                {"form": {'errors': "Password can't be empty."}})
 
         try:
             validate_email(email)
         except ValidationError:
-            return render(request, template, {"form": {'errors': "Need a valid email."}})
+            return render(
+                request, template, {"form": {'errors': "Need a valid email."}})
 
         password_validation, error = is_password_valid(password)
         if not password_validation:
@@ -156,7 +165,8 @@ class RegistrationView(View):
                 {"form": {'errors': "Emails doesn't match."}})
 
         if Member.objects.filter(email=email).exists():
-            return render(request, template, {"form": {'errors': "Email already used."}})
+            return render(
+                request, template, {"form": {'errors': "Email already used."}})
 
         try:
             member = Member(email=email, is_active=False)
@@ -197,7 +207,9 @@ class ResendRegistrationView(View):
             return HttpResponseRedirect(reverse('account'))
 
         email = request.POST.get('email')
-        msg = "If you give me a valid email, you'll received an email with some help."
+        msg = (
+            "If you give me a valid email, you'll "
+            "received an email with some help.")
 
         try:
             member = Member.objects.get(email=email)
@@ -221,7 +233,9 @@ class RegistrationConfirmationView(View):
             return render(
                 request,
                 'error.html',
-                {'title': 'Error', 'error': 'Invalid key or account already active.'})
+                {
+                    'title': 'Error',
+                    'error': 'Invalid key or account already active.'})
 
         if member.is_active:
             messages.info(request, "Your account is already active.")
@@ -260,7 +274,7 @@ class AccountDeleteView(View, LoginRequiredMixin):
     def get(self, request):
         return render(request, 'account-delete.html')
 
-    @transaction.commit_on_success
+    @transaction.atomic
     def post(self, request):
         if request.user.is_staff:
             messages.warning(request, "Impossible to remove staff account.")
@@ -270,7 +284,8 @@ class AccountDeleteView(View, LoginRequiredMixin):
         request.user.package_set.all().delete()
         request.user.delete()
         messages.success(
-            request, "Your account has been removed with success. See you soon!")
+            request,
+            "Your account has been removed with success. See you soon!")
 
         send_custom_mail(
             'Sublimall.org account deleted',
@@ -294,7 +309,9 @@ class PasswordRecoveryView(View):
 
     def post(self, request):
         email = request.POST.get('email')
-        msg = "If you give me a valid email, you'll received an email with some help."
+        msg = (
+            "If you give me a valid email, "
+            "you'll received an email with some help.")
         try:
             member = Member.objects.get(email=email)
         except Member.DoesNotExist:
@@ -326,10 +343,14 @@ class PasswordRecoveryConfirmationView(View):
 
         if member is None:
             return render(
-                request, 'error.html', {'title': 'Error', 'error': 'Invalid key.'})
+                request,
+                'error.html',
+                {'title': 'Error', 'error': 'Invalid key.'})
 
         return render(
-            request, 'password-recovery-form.html', {'id': pk, 'password_key': key})
+            request,
+            'password-recovery-form.html',
+            {'id': pk, 'password_key': key})
 
     def post(self, request, pk, key):
         password = request.POST.get('password')
@@ -344,7 +365,9 @@ class PasswordRecoveryConfirmationView(View):
 
         if member is None:
             return render(
-                request, 'error.html', {'title': 'Error', 'error': 'Invalid key.'})
+                request,
+                'error.html',
+                {'title': 'Error', 'error': 'Invalid key.'})
 
         password_validation, error = is_password_valid(password)
         if not password_validation:
@@ -357,8 +380,10 @@ class PasswordRecoveryConfirmationView(View):
             return render(
                 request,
                 template,
-                {"form":
-                    {'errors': "Password doesn't match."}, "pk": pk, "password_key": key})
+                {
+                    "form": {'errors': "Password doesn't match."},
+                    "pk": pk,
+                    "password_key": key})
 
         member.set_password(password)
         member.save()

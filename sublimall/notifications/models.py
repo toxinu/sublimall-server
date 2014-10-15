@@ -21,5 +21,6 @@ class Notification(models.Model):
     title = models.CharField(max_length=50)
     short_text = models.TextField(max_length=300)
     text = models.TextField(blank=True, null=True)
-    level = models.CharField(max_length=10, choices=LEVEL_CHOICES, default=DEFAULT_LEVEL)
+    level = models.CharField(
+        max_length=10, choices=LEVEL_CHOICES, default=DEFAULT_LEVEL)
     is_draft = models.BooleanField(default=True)

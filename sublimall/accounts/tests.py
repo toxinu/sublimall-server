@@ -141,7 +141,8 @@ class MemberTestCase(TestCase):
         """
         MemberManager create_superuser method
         """
-        m = Member.objects.create_superuser(email="foo2@bar.com", password="foobar")
+        m = Member.objects.create_superuser(
+            email="foo2@bar.com", password="foobar")
         self.assertTrue(m.is_superuser)
 
     def test_member_create_user(self):
@@ -151,7 +152,8 @@ class MemberTestCase(TestCase):
         m = Member.objects.create_user(email="foo2@bar.com", password="foobar")
         self.assertTrue(m.is_active)
 
-        self.assertRaises(ValueError, Member.objects.create_user, password="foobar")
+        self.assertRaises(
+            ValueError, Member.objects.create_user, password="foobar")
 
     def test_member_default_api_key(self):
         """
@@ -227,13 +229,15 @@ class RegistrationTestCase(TestCase):
         # Empty password
         r = self.c.post(reverse('registration'), data)
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.context['form']['errors'], "Password can't be empty.")
+        self.assertEqual(
+            r.context['form']['errors'], "Password can't be empty.")
 
         # Not same valid password
         data.update({'password': 'foobar123', 'password2': 'foobar1234'})
         r = self.c.post(reverse('registration'), data)
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.context['form']['errors'], "Password doesn't match.")
+        self.assertEqual(
+            r.context['form']['errors'], "Password doesn't match.")
 
         # Without numerical character
         data.update({'password': 'foobar', 'password2': 'foobarr'})
@@ -353,7 +357,8 @@ class RegistrationTestCase(TestCase):
         r = self.c.get(reverse(
             'registration-confirmation', args=[100, member.registration_key]))
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.context['error'], 'Invalid key or account already active.')
+        self.assertEqual(
+            r.context['error'], 'Invalid key or account already active.')
 
         member = Member.objects.get(email=data.get('email'))
         self.assertFalse(member.is_active)
@@ -376,7 +381,8 @@ class RegistrationTestCase(TestCase):
             'registration-confirmation',
             args=[member.id, member.registration_key[:-4] + "test"]))
         self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.context['error'], 'Invalid key or account already active.')
+        self.assertEqual(
+            r.context['error'], 'Invalid key or account already active.')
 
         self.assertFalse(member.is_active)
 
@@ -392,10 +398,12 @@ class RegistrationTestCase(TestCase):
         }
         self.c.post(reverse('registration'), data)
         r = self.c.post(
-            reverse('login'), {'username': 'foo@bar.com', 'password': 'foobar123'})
+            reverse('login'),
+            {'username': 'foo@bar.com', 'password': 'foobar123'})
         self.assertEqual(r.status_code, 200)
         self.assertEqual(
-            r.context['form'].errors['__all__'][0], 'This account is inactive.')
+            r.context['form'].errors['__all__'][0],
+            'This account is inactive.')
         self.assertFalse(self.c.session.get('_auth_user_id', False))
 
     def test_login_active_member(self):
@@ -425,7 +433,8 @@ class RegistrationTestCase(TestCase):
         old_MAX_MEMBER = settings.MAX_MEMBER
         settings.MAX_MEMBER = 5
         for i in range(0, settings.MAX_MEMBER):
-            Member.objects.create_user(email="foo%s@bar.com" % i, password="foobar")
+            Member.objects.create_user(
+                email="foo%s@bar.com" % i, password="foobar")
 
         r = self.c.get(reverse('registration'))
         self.assertEqual(r.status_code, 200)

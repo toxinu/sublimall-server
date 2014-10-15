@@ -17,7 +17,7 @@ from sublimall.mixins import LoginRequiredMixin
 
 
 class UploadPackageAPIView(APIMixin, View):
-    @transaction.commit_on_success
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
         email = request.FILES.get('email')
         api_key = request.FILES.get('api_key')
@@ -58,19 +58,20 @@ class UploadPackageAPIView(APIMixin, View):
                 json.dumps({'success': False, 'errors': ['Bad credentials.']}))
         if not member.is_active:
             return HttpResponseForbidden(
-                json.dumps({'success': False, 'errors': ['Account not active.']}))
+                json.dumps(
+                    {'success': False, 'errors': ['Account not active.']}))
 
         try:
             version = int(version)
         except ValueError:
-            return HttpResponseBadRequest(
-                json.dumps(
-                    {'success': False, 'errors': ['Bad version. Must be 2 or 3.']}))
+            return HttpResponseBadRequest(json.dumps({
+                'success': False,
+                'errors': ['Bad version. Must be 2 or 3.']}))
 
         if version not in [2, 3]:
-            return HttpResponseBadRequest(
-                json.dumps(
-                    {'success': False, 'errors': ['Bad version. Must be 2 or 3.']}))
+            return HttpResponseBadRequest(json.dumps({
+                'success': False,
+                'errors': ['Bad version. Must be 2 or 3.']}))
 
         try:
             package = member.package_set.get(version=version)
@@ -95,8 +96,7 @@ class UploadPackageAPIView(APIMixin, View):
             package.full_clean()
         except ValidationError as err:
             return HttpResponseBadRequest(
-                json.dumps(
-                    {'success': False, 'errors': err.messages}))
+                json.dumps({'success': False, 'errors': err.messages}))
 
         package.save()
 
@@ -125,19 +125,22 @@ class DownloadPackageAPIView(APIMixin, View):
                 json.dumps({'success': False, 'errors': ['Bad credentials.']}))
         if not member.is_active:
             return HttpResponseForbidden(
-                json.dumps({'success': False, 'errors': ['Account not active.']}))
+                json.dumps(
+                    {'success': False, 'errors': ['Account not active.']}))
 
         try:
             package = member.package_set.get(version=version)
         except Package.DoesNotExist:
             return HttpResponseNotFound(
-                json.dumps({'success': False, 'errors': ['Package not found.']}))
+                json.dumps(
+                    {'success': False, 'errors': ['Package not found.']}))
 
         response = HttpResponse(
-            package.package.read(), mimetype='application/zip, application/octet-stream')
+            package.package.read(),
+            mimetype='application/zip, application/octet-stream')
         response.streaming = True
-        response['Content-Disposition'] = 'attachment; filename=package_version-%s.zip' \
-            % package.version
+        response['Content-Disposition'] = (
+            'attachment; filename=package_version-%s.zip' % package.version)
         return response
 
 
@@ -184,7 +187,8 @@ class DeletePackageAPIView(APIMixin, View):
             package = member.package_set.filter(version=version)
         except Package.DoesNotExist:
             return HttpResponseNotFound(
-                json.dumps({'success': False, 'errors': ['Package not found.']}))
+                json.dumps(
+                    {'success': False, 'errors': ['Package not found.']}))
 
         package.delete()
         return HttpResponse({'success': True})
@@ -208,4 +212,6 @@ class MaxPackageSizeAPIView(APIMixin, View):
             return HttpResponseForbidden(
                 json.dumps({'success': False, 'errors': ['Bad credentials.']}))
 
-        return HttpResponse(json.dumps({'success': True, 'output': member.get_storage_limit()}))
+        return HttpResponse(
+            json.dumps(
+                {'success': True, 'output': member.get_storage_limit()}))

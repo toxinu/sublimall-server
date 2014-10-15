@@ -1,3 +1,2 @@
-Django==1.6.5
-south==0.8.4
-stripe==1.14.0
+Django==1.7
+stripe==1.19.0
