@@ -6,7 +6,8 @@ from .models import Package
 
 class PackageAdmin(admin.ModelAdmin):
     list_display = (
-        'member', 'version', 'platform', 'arch', 'get_display_size', 'update', )
+        'member', 'version', 'platform', 'arch',
+        'get_display_size', 'update', )
     list_filter = ('version', 'platform', 'arch', 'update', )
     search_fields = ('id', 'member__email', )
 

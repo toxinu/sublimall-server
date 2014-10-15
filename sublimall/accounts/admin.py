@@ -13,7 +13,8 @@ class PackageInline(admin.TabularInline):
 
 class MemberAdmin(admin.ModelAdmin):
     list_display = (
-        'email', 'api_key', 'is_active', 'date_joined', 'last_login', 'is_staff', )
+        'email', 'api_key', 'is_active', 'date_joined',
+        'last_login', 'is_staff', )
     list_filter = ('is_active', 'is_staff', 'date_joined', 'last_login', )
     search_fields = ('id', 'email', )
     actions = ['resend_registration']
@@ -24,6 +25,7 @@ class MemberAdmin(admin.ModelAdmin):
     def resend_registration(self, request, queryset):
         connection = get_connection()
         for member in queryset.all().only('registration_key', 'email', 'id'):
-            member.send_registration_confirmation(reset_key=True, connection=connection)
+            member.send_registration_confirmation(
+                reset_key=True, connection=connection)
 
 admin.site.register(Member, MemberAdmin)

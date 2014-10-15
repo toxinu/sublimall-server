@@ -5,7 +5,8 @@ from .models import Notification
 
 
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ('get_display_title', 'added', 'member', 'level', 'is_draft', )
+    list_display = (
+        'get_display_title', 'added', 'member', 'level', 'is_draft', )
     list_filter = ('is_draft', 'level', )
     raw_id_fields = ('member', )
 

@@ -17,11 +17,11 @@ class APIMixin(object):
 
     @csrf_exempt
     def dispatch(self, *args, **kwargs):
-        return super(APIMixin, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
 
 class LoginRequiredMixin(object):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
             return HttpResponseRedirect(reverse('login'))
-        return super(LoginRequiredMixin, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)

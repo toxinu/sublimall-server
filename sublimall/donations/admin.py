@@ -5,7 +5,8 @@ from .models import Donation
 
 
 class DonationAdmin(admin.ModelAdmin):
-    list_display = ('get_member', 'get_amount', 'get_provider', 'get_payment_url')
+    list_display = (
+        'get_member', 'get_amount', 'get_provider', 'get_payment_url')
     search_fields = ('id', 'member__email', 'email')
     raw_id_fields = ('member', )
 

@@ -30,7 +30,8 @@ class DonationsView(APIMixin, View):
 
         if not email or not token or not amount:
             message = {'success': False, 'errors': []}
-            messages.error(request, "Failed to proceed donation, sorry about that.")
+            messages.error(
+                request, "Failed to proceed donation, sorry about that.")
             if not email:
                 message['errors'].append('Email is mandatory')
             if not token:
@@ -40,7 +41,8 @@ class DonationsView(APIMixin, View):
             return HttpResponseBadRequest(json.dumps(message))
 
         if request.user.is_authenticated():
-            donation = Donation(member=request.user, token_id=token, amount=amount)
+            donation = Donation(
+                member=request.user, token_id=token, amount=amount)
         else:
             donation = Donation(email=email, token_id=token, amount=amount)
 
@@ -50,11 +52,13 @@ class DonationsView(APIMixin, View):
             if not donation.paid:
                 raise Exception
         except:
-            messages.error(request, "Failed to proceed donation, sorry about that.")
+            messages.error(
+                request, "Failed to proceed donation, sorry about that.")
             return HttpResponse(json.dumps(
                 {'success': False, 'error': 'Failed to credit your card.'}))
 
         donation.save()
         messages.success(
-            request, "Thank you for your donation.<br />Your account is now upgrade!")
+            request,
+            "Thank you for your donation.<br />Your account is now upgrade!")
         return HttpResponse(json.dumps({'success': True, 'amount': amount}))

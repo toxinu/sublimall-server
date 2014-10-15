@@ -39,7 +39,8 @@ class Package(models.Model):
 @receiver(models.signals.post_delete, sender=Package)
 def auto_delete_package_on_delete(sender, instance, **kwargs):
     """
-    Deletes file from filesystem when corresponding `Package` object is deleted.
+    Deletes file from filesystem when corresponding `Package`
+    object is deleted.
     """
     if default_storage.exists(instance.package.path):
         default_storage.delete(instance.package.path)
@@ -48,7 +49,8 @@ def auto_delete_package_on_delete(sender, instance, **kwargs):
 @receiver(models.signals.pre_save, sender=Package)
 def auto_delete_package_on_change(sender, instance, **kwargs):
     """
-    Deletes file from filesystem when corresponding `Package` object is changed.
+    Deletes file from filesystem when corresponding `Package`
+    object is changed.
     """
     if not instance.pk:
         return False
