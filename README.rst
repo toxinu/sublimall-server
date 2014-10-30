@@ -19,7 +19,8 @@ Installation
     virtualenv-3 virtenv
     source virtenv
     pip install -r requirements.txt
-    python manage.py syncdb
+    python manage.py migrate
+    python manage.py createsuperuser
     python manage.py runserver
 
 
