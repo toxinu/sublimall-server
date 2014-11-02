@@ -23,6 +23,7 @@
                         <li><strong>Email</strong> : {{ email }}</li>
                         <li><strong>API key</strong> : <kbd>{{ api_key }}</kbd> </li>
                         <li><strong>Storage limit</strong> : <kbd>{{ storage_limit|filesizeformat }}</kbd> </li>
+                        <li><strong>Date joined</strong> : {{ date_joined }}</li>
                     </ul>
                     {% if is_donator %}
                         <h2>Your donations</h2>
@@ -53,19 +54,20 @@
                             <ul class="list-unstyled">
                                 <li><strong>Version</strong> : SublimeText {{ package.version }}</li>
                                 <li><strong>Uploaded</strong> : {{ package.update }}</li>
-                                <li><strong>Size</strong> : {{ package.package.file.size|filesizeformat }}</li>
+                                <li><strong>Size</strong> : {{ package.package.size|filesizeformat }}</li>
                                 {% if package.platform or package.arch %}
                                     <li><strong>System</strong> : {{ package.platform }} {{ package.arch }}</li>
                                 {% endif %}
                             </ul>
-                            <!-- TODO: Remove this hardcoded url -->
-                            <form method="post" action="http://sublimall.org{% url 'api-download' %}">
+                            <form method="post" action="{% url 'api-download' %}">
                                 <input type="hidden" value="{{ email }}" name="email">
                                 <input type="hidden" value="{{ api_key }}" name="api_key">
                                 <input type="hidden" value="{{ package.version }}" name="version">
+                                <input type="hidden" value="{{ package.pk }}" name="package_id">
                                 <button type="submit" class="btn btn-success btn-sm">Download</button>
                                 <a class="btn btn-danger btn-xs" href="{% url 'delete-package' package.id %}">Delete</a>
                             </form>
+                            <hr>
                         {% endfor %}
                     {% else %}
                         <p>No package uploaded. Let's install <a href="{% url 'docs' %}">Sublimall plugin!</a></p>

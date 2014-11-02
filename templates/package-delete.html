@@ -8,7 +8,7 @@
             <ul class="list-unstyled">
                 <li><strong>Version</strong> : SublimeText {{ package.version }}</li>
                 <li><strong>Uploaded</strong> : {{ package.update }}</li>
-                <li><strong>Size</strong> : {{ package.package.file.size|filesizeformat }}</li>
+                <li><strong>Size</strong> : {{ package.package.size|filesizeformat }}</li>
                 {% if package.platform or package.arch %}
                     <li><strong>System</strong> : {{ package.platform }} {{ package.arch }}</li>
                 {% endif %}

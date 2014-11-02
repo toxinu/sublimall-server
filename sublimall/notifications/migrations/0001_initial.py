@@ -13,14 +13,15 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Package',
+            name='Notification',
             fields=[
                 ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
-                ('version', models.PositiveSmallIntegerField()),
-                ('platform', models.CharField(max_length=30, null=True, blank=True)),
-                ('arch', models.CharField(max_length=20, null=True, blank=True)),
-                ('update', models.DateTimeField(auto_now=True)),
-                ('package', models.FileField(upload_to='packages')),
+                ('added', models.DateTimeField(auto_now=True)),
+                ('title', models.CharField(max_length=50)),
+                ('short_text', models.TextField(max_length=300)),
+                ('text', models.TextField(null=True, blank=True)),
+                ('level', models.CharField(max_length=10, default='info', choices=[('success', 'Success'), ('info', 'Info'), ('warning', 'Warning'), ('danger', 'Danger')])),
+                ('is_draft', models.BooleanField(default=True)),
                 ('member', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
             ],
             options={

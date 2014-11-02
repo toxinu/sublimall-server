@@ -13,15 +13,16 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Package',
+            name='Donation',
             fields=[
                 ('id', models.AutoField(serialize=False, auto_created=True, verbose_name='ID', primary_key=True)),
-                ('version', models.PositiveSmallIntegerField()),
-                ('platform', models.CharField(max_length=30, null=True, blank=True)),
-                ('arch', models.CharField(max_length=20, null=True, blank=True)),
-                ('update', models.DateTimeField(auto_now=True)),
-                ('package', models.FileField(upload_to='packages')),
-                ('member', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
+                ('email', models.EmailField(max_length=75, null=True, blank=True)),
+                ('amount', models.IntegerField()),
+                ('token_id', models.CharField(max_length=50)),
+                ('charge_id', models.CharField(max_length=50, null=True, blank=True)),
+                ('paid', models.BooleanField(default=False)),
+                ('date', models.DateTimeField(auto_now_add=True)),
+                ('member', models.ForeignKey(blank=True, null=True, to=settings.AUTH_USER_MODEL)),
             ],
             options={
             },

@@ -2,6 +2,7 @@
 import json
 from django.db import transaction
 from django.shortcuts import render
+from django.shortcuts import redirect
 from django.views.generic import View
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -39,7 +40,6 @@ class UploadPackageAPIView(APIMixin, View):
             arch = arch.read()
         if package_file:
             package_size = package_file.seek(0, 2)
-
         if not email or not api_key or not package_size or not version:
             message = {'success': False, 'errors': []}
             if not email:
@@ -73,24 +73,12 @@ class UploadPackageAPIView(APIMixin, View):
                 'success': False,
                 'errors': ['Bad version. Must be 2 or 3.']}))
 
-        try:
-            package = member.package_set.get(version=version)
-        except Package.DoesNotExist:
-            package = None
-
-        if package:
-            package.member = member
-            package.version = version
-            package.platform = platform
-            package.arch = arch
-            package.package = package_file
-        else:
-            package = Package(
-                member=member,
-                version=version,
-                platform=platform,
-                arch=arch,
-                package=package_file)
+        package = Package(
+            member=member,
+            version=version,
+            platform=platform,
+            arch=arch,
+            package=package_file)
 
         try:
             package.full_clean()
@@ -99,7 +87,11 @@ class UploadPackageAPIView(APIMixin, View):
                 json.dumps({'success': False, 'errors': err.messages}))
 
         package.save()
-
+        # Cleanup old packages
+        old_packages = member.package_set.filter(
+            version=version).exclude(pk=package.pk)
+        for old_package in old_packages:
+            old_package.delete()
         return HttpResponse(json.dumps({'success': True}), status=201)
 
 
@@ -108,6 +100,7 @@ class DownloadPackageAPIView(APIMixin, View):
         email = request.POST.get('email')
         api_key = request.POST.get('api_key')
         version = request.POST.get('version')
+        package_id = request.POST.get('package_id')
 
         if not email or not api_key and not version:
             message = {'success': False, 'errors': []}
@@ -127,9 +120,19 @@ class DownloadPackageAPIView(APIMixin, View):
             return HttpResponseForbidden(
                 json.dumps(
                     {'success': False, 'errors': ['Account not active.']}))
+        if package_id and not member.package_set.get(pk=package_id):
+            return HttpResponseForbidden(
+                json.dumps(
+                    {
+                        'success': False,
+                        'errors': ['Access to this package is not allowed.']}))
 
         try:
-            package = member.package_set.get(version=version)
+            if package_id:
+                package = member.package_set.only('package').get(pk=package_id)
+            else:
+                package = member.package_set.filter(
+                    version=version).only('package').latest('update')
         except Package.DoesNotExist:
             return HttpResponseNotFound(
                 json.dumps(
@@ -137,11 +140,13 @@ class DownloadPackageAPIView(APIMixin, View):
 
         response = HttpResponse(
             package.package.read(),
-            mimetype='application/zip, application/octet-stream')
+            content_type='application/zip, application/octet-stream')
         response.streaming = True
         response['Content-Disposition'] = (
             'attachment; filename=package_version-%s.zip' % package.version)
         return response
+
+        # return redirect(package.package.url)
 
 
 class DeletePackageView(LoginRequiredMixin, View):
