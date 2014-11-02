@@ -12,7 +12,7 @@ You'll need:
 cd /var/www
 git clone https://github.com/socketubs/sublimall-server.git sublimall
 cd sublimall
-virtualenv venv
+virtualenv -p /usr/bin/python3 venv
 source venv/bin/activate
 pip install -r requirements.txt
 cp sublimall/local_settings_example.py sublimall/local_settings.py
