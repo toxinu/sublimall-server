@@ -4,7 +4,7 @@
 
 You'll need:
  - Python 3
- - Database like postgresql is optionnal if you use Sublimall for personnal or few users
+ - Database like Postgresql is optionnal if you use Sublimall for personnal or few users
  
 ## Installation
 
@@ -42,4 +42,4 @@ And you just have to change your Sublime Text plugin settings.
 "api_root_url": "http://<ip>:<port>",
 ```
 
-0: http://supervisord.org/
+[0]: http://supervisord.org/
