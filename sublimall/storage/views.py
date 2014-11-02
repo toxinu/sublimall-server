@@ -40,7 +40,6 @@ class UploadPackageAPIView(APIMixin, View):
             arch = arch.read()
         if package_file:
             package_size = package_file.seek(0, 2)
-
         if not email or not api_key or not package_size or not version:
             message = {'success': False, 'errors': []}
             if not email:
@@ -88,13 +87,11 @@ class UploadPackageAPIView(APIMixin, View):
                 json.dumps({'success': False, 'errors': err.messages}))
 
         package.save()
-
         # Cleanup old packages
         old_packages = member.package_set.filter(
             version=version).exclude(pk=package.pk)
         for old_package in old_packages:
             old_package.delete()
-
         return HttpResponse(json.dumps({'success': True}), status=201)
 
 
@@ -141,7 +138,15 @@ class DownloadPackageAPIView(APIMixin, View):
                 json.dumps(
                     {'success': False, 'errors': ['Package not found.']}))
 
-        return redirect(package.package.url)
+        response = HttpResponse(
+            package.package.read(),
+            content_type='application/zip, application/octet-stream')
+        response.streaming = True
+        response['Content-Disposition'] = (
+            'attachment; filename=package_version-%s.zip' % package.version)
+        return response
+
+        # return redirect(package.package.url)
 
 
 class DeletePackageView(LoginRequiredMixin, View):
