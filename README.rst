@@ -4,13 +4,12 @@ Sublimall
 .. image:: https://coveralls.io/repos/socketubs/sublimall-server/badge.png
   :target: https://coveralls.io/r/socketubs/sublimall-server
 
-.. image:: https://badges.gitter.im/socketubs/Sublimall.png
-  :target: https://gitter.im/socketubs/Sublimall
-
 Sublimall is Python 3 server behind Sublimall_ SublimeText plugin.
 
 Installation
 ~~~~~~~~~~~~
+
+Let's read INSTALL.md or follow this quick and dirty install steps:
 
 ::
 
@@ -22,7 +21,6 @@ Installation
     python manage.py migrate
     python manage.py createsuperuser
     python manage.py runserver
-
 
 Tests
 ~~~~~
