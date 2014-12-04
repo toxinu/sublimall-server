@@ -37,6 +37,69 @@ autorestart=true
 redirect_stderr=true
 ```
 
+For nginx, this is a production server configuration file dump:
+
+```
+server {
+    listen 80;
+    server_name example.com;
+
+    error_log /var/log/nginx/sublimall.error.log;
+    access_log /var/log/nginx/sublimall.access.log;
+
+    client_max_body_size 150m;
+
+    location /api {
+        proxy_hide_header Server;
+
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forward-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Ssl on;
+        proxy_pass http://127.0.0.1:9002;
+    }
+
+    location / {
+        rewrite ^ https://example.com$request_uri permanent;
+    }
+}
+server {
+    listen 443 ssl spdy;
+    server_name example.com;
+
+    ssl_certificate /etc/nginx/ssl/sublimall.public.crt;
+    ssl_certificate_key /etc/nginx/ssl/sublimall.private.rsa;
+    
+    error_log /var/log/nginx/sublimall.error.log;
+    access_log /var/log/nginx/sublimall.access.log;
+
+    if ($http_host != "sublimall.org") {
+        rewrite ^ https://example.com$request_uri permanent;
+    }
+
+    location /api {
+        rewrite ^ http://example.com$request_uri permanent;
+    }
+
+    location /static {
+        autoindex on;
+        root /var/www/sublimall;
+    }
+
+    location / {
+        proxy_hide_header Server;
+
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forward-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Ssl on;
+        proxy_pass http://127.0.0.1:9002;
+    }
+}
+```
+
+As you can see, configuration file include ssl, which you can drop easily.
+
 ## Plugin
 
 And you just have to change your Sublime Text plugin settings.
