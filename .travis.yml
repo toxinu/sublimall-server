@@ -1,6 +1,6 @@
 language: python
 python:
-  - 3.3
+  - 3.6
 install:
   - pip install -r requirements.txt --use-mirrors
   - cp sublimall/local_settings_example.py sublimall/local_settings.py
