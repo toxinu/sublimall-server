@@ -1,8 +1,8 @@
 Sublimall
 =========
 
-.. image:: https://coveralls.io/repos/socketubs/sublimall-server/badge.png
-  :target: https://coveralls.io/r/socketubs/sublimall-server
+.. image:: https://coveralls.io/repos/toxinu/sublimall-server/badge.png
+  :target: https://coveralls.io/r/toxinu/sublimall-server
 
 Sublimall is Python 3.6 server behind Sublimall_ SublimeText plugin.
 
@@ -13,7 +13,7 @@ Let's read INSTALL.md or follow this quick and dirty install steps:
 
 ::
 
-    git clone https://github.com/socketubs/sublimall-server.git
+    git clone https://github.com/toxinu/sublimall-server.git
     cd sublimall-server
     virtualenv virtenv
     source virtenv
@@ -33,4 +33,4 @@ Sublimall server is tested at ~90% coverage.
     make coverage
     firefox htmlcov/index.html
 
-.. _Sublimall: https://github.com/socketubs/Sublimall
+.. _Sublimall: https://github.com/toxinu/sublimall
