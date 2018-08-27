@@ -3,8 +3,8 @@ Sublimall
 
 .. image:: https://travis-ci.org/toxinu/sublimall-server.svg?branch=master
   :target: https://travis-ci.org/toxinu/sublimall-server
-.. image:: https://coveralls.io/repos/toxinu/sublimall-server/badge.png
-  :target: https://coveralls.io/r/toxinu/sublimall-server
+.. image:: https://coveralls.io/repos/github/toxinu/sublimall-server/badge.svg?branch=master
+  :target: https://coveralls.io/github/toxinu/sublimall-server?branch=master
 
 Sublimall is Python 3.6 server behind Sublimall_ SublimeText plugin.
 
