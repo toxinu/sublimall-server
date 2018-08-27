@@ -7,7 +7,7 @@ from .accounts.models import Member
 
 
 class APIMixin(object):
-    http_method_names = ['post']
+    http_method_names = ["post"]
 
     def get_member(self, email, api_key):
         try:
@@ -23,5 +23,5 @@ class APIMixin(object):
 class LoginRequiredMixin(object):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated():
-            return HttpResponseRedirect(reverse('login'))
+            return HttpResponseRedirect(reverse("login"))
         return super().dispatch(request, *args, **kwargs)

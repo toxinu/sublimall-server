@@ -17,7 +17,7 @@
       <div class="header">
         <ul class="nav nav-pills pull-right">
           <li class="{% navactive request 'home' %}"><a href="/#">Home</a></li>
-          <li><a href="https://github.com/socketubs/Sublimall" target="_blank">Github</a></li>
+          <li><a href="https://github.com/toxinu/sublimall" target="_blank">Github</a></li>
           <li class="{% navactive request 'docs' %}"><a href="{% url 'docs' %}">Docs</a></li>
           <li class="{% navactive request 'donations' %}"><a href="{% url 'donations' %}">Donate
           {% if user.is_authenticated %}
@@ -55,7 +55,7 @@
       {% block content %}{% endblock %}
       <br />
       <div class="footer">
-        <p>&copy; Sublimall 2014</p>
+        <p>&copy; sublimall 2018</p>
       </div>
     </div>
   {% if analytics_enabled %}

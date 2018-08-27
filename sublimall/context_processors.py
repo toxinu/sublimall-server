@@ -4,6 +4,6 @@ from django.conf import settings
 
 def analytics(request):
     data = {}
-    if hasattr(settings, 'ANALYTICS_ENABLED'):
-        data.update({'analytics_enabled': True})
+    if hasattr(settings, "ANALYTICS_ENABLED"):
+        data.update({"analytics_enabled": True})
     return data

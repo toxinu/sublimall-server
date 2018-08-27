@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 
 from ..accounts.models import Member
 
-if hasattr(settings, 'STRIPE_SECRET_KEY'):
+if hasattr(settings, "STRIPE_SECRET_KEY"):
     stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
@@ -22,7 +22,7 @@ class Donation(models.Model):
 
     def clean(self, *args, **kwargs):
         if not self.member and not self.email:
-            raise ValidationError('Need an email or member')
+            raise ValidationError("Need an email or member")
         super(Donation, self).clean(*args, **kwargs)
 
     def get_email(self):
@@ -39,19 +39,20 @@ class Donation(models.Model):
             amount=self.amount,
             currency="eur",
             card=self.token_id,
-            description="Charge for %s" % self.get_email())
+            description="Charge for %s" % self.get_email(),
+        )
         self.charge_id = c.id
         self.paid = c.paid
         self.save()
 
     def get_provider(self):
-        if self.token_id.startswith('tok_'):
-            return 'Stripe'
+        if self.token_id.startswith("tok_"):
+            return "Stripe"
         else:
-            return 'Paypal'
+            return "Paypal"
 
     def get_payment_url(self):
-        if self.get_provider().lower() == 'paypal':
-            return 'https://www.paypal.com/fr/vst/id=%s' % self.token_id
+        if self.get_provider().lower() == "paypal":
+            return "https://www.paypal.com/fr/vst/id=%s" % self.token_id
         else:
-            return 'https://manage.stripe.com/payments/%s' % self.charge_id
+            return "https://manage.stripe.com/payments/%s" % self.charge_id

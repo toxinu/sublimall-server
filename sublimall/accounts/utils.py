@@ -4,8 +4,7 @@ import hashlib
 
 
 def get_hash():
-    return hashlib.sha224(
-        str(random.getrandbits(256)).encode('utf-8')).hexdigest()[:40]
+    return hashlib.sha224(str(random.getrandbits(256)).encode("utf-8")).hexdigest()[:40]
 
 
 def is_password_valid(password):

@@ -4,7 +4,7 @@ Sublimall
 .. image:: https://coveralls.io/repos/socketubs/sublimall-server/badge.png
   :target: https://coveralls.io/r/socketubs/sublimall-server
 
-Sublimall is Python 3 server behind Sublimall_ SublimeText plugin.
+Sublimall is Python 3.6 server behind Sublimall_ SublimeText plugin.
 
 Installation
 ~~~~~~~~~~~~
@@ -15,7 +15,7 @@ Let's read INSTALL.md or follow this quick and dirty install steps:
 
     git clone https://github.com/socketubs/sublimall-server.git
     cd sublimall-server
-    virtualenv-3 virtenv
+    virtualenv virtenv
     source virtenv
     pip install -r requirements.txt
     python manage.py migrate

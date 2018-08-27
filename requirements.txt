@@ -1,5 +1,4 @@
-Django==1.7
+Django==1.11.15
 stripe==1.19.0
 boto==2.34.0
-# Fork of django-storages for python 3
-https://bitbucket.org/socketubs/django-storages/get/default.zip
+django-storages==1.6.6

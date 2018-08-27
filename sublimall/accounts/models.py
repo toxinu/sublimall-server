@@ -15,14 +15,13 @@ from ..utils import send_custom_mail
 
 
 class MemberManager(BaseUserManager):
-    def _create_user(
-            self, email, password, is_staff, is_superuser, **extra_fields):
+    def _create_user(self, email, password, is_staff, is_superuser, **extra_fields):
         """
         Creates and saves a User with the given email and password.
         """
         now = timezone.now()
         if not email:
-            raise ValueError('The given email must be set')
+            raise ValueError("The given email must be set")
         email = self.normalize_email(email)
         user = self.model(
             email=email,
@@ -31,41 +30,44 @@ class MemberManager(BaseUserManager):
             is_superuser=is_superuser,
             last_login=now,
             date_joined=now,
-            **extra_fields)
+            **extra_fields
+        )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
     def create_user(self, email=None, password=None, **extra_fields):
-        return self._create_user(
-            email, password, False, False, **extra_fields)
+        return self._create_user(email, password, False, False, **extra_fields)
 
     def create_superuser(self, email, password, **extra_fields):
-        return self._create_user(
-            email, password, True, True, **extra_fields)
+        return self._create_user(email, password, True, True, **extra_fields)
 
 
 class Member(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(_('email address'), blank=True, unique=True)
+    email = models.EmailField(_("email address"), blank=True, unique=True)
     api_key = models.CharField(max_length=40, null=True, blank=True)
     is_staff = models.BooleanField(
-        _('staff status'),
+        _("staff status"),
+        default=False,
+        help_text=_("Designates whether the user can log into this admin site."),
+    )
+    is_active = models.BooleanField(
+        _("active"),
         default=False,
         help_text=_(
-            'Designates whether the user can log into this admin site.'))
-    is_active = models.BooleanField(
-        _('active'),
-        default=False,
-        help_text=_('Designates whether this user should be treated as '
-                    'active. Unselect this instead of deleting accounts.'))
-    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+            "Designates whether this user should be treated as "
+            "active. Unselect this instead of deleting accounts."
+        ),
+    )
+    date_joined = models.DateTimeField(_("date joined"), default=timezone.now)
     registration_key = models.CharField(
-        max_length=40, default=get_hash, null=True, blank=True)
+        max_length=40, default=get_hash, null=True, blank=True
+    )
     password_key = models.CharField(max_length=40, null=True, blank=True)
 
     objects = MemberManager()
 
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     def __str__(self):
@@ -86,8 +88,7 @@ class Member(AbstractBaseUser, PermissionsMixin):
         return self.email
 
     def is_donator(self):
-        if self.donation_set.filter(
-                charge_id__isnull=False, paid=True).only('paid'):
+        if self.donation_set.filter(charge_id__isnull=False, paid=True).only("paid"):
             return True
         return False
 
@@ -109,12 +110,17 @@ class Member(AbstractBaseUser, PermissionsMixin):
             self.save()
 
         send_custom_mail(
-            'Sublimall.org account creation confirmation',
+            "Sublimall.org account creation confirmation",
             self.email,
-            'registration',
-            {'registration_link': urljoin(
-                settings.SITE_URL,
-                reverse(
-                    'registration-confirmation',
-                    args=[self.id, self.registration_key]))},
-            connection=connection)
+            "registration",
+            {
+                "registration_link": urljoin(
+                    settings.SITE_URL,
+                    reverse(
+                        "registration-confirmation",
+                        args=[self.id, self.registration_key],
+                    ),
+                )
+            },
+            connection=connection,
+        )
