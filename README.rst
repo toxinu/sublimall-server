@@ -18,7 +18,7 @@ Let's read INSTALL.md or follow this quick and dirty install steps:
     git clone https://github.com/toxinu/sublimall-server.git
     cd sublimall-server
     virtualenv virtenv
-    source virtenv
+    source virtenv/bin/activate
     pip install -r requirements.txt
     python manage.py migrate
     python manage.py createsuperuser
